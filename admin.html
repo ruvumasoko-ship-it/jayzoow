@@ -23,17 +23,10 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
             min-height: 100vh;
         }
         
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        /* Login Page Styles */
+        /* Login Page */
         .login-page {
             display: flex;
             justify-content: center;
@@ -63,66 +56,26 @@
             margin-bottom: 30px;
         }
         
-        .login-card input {
+        .google-btn {
             width: 100%;
             padding: 15px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 50px;
-            font-size: 16px;
-            outline: none;
-            transition: 0.2s;
-        }
-        
-        .login-card input:focus {
-            border-color: #ff9800;
-            box-shadow: 0 0 0 3px rgba(255,152,0,0.1);
-        }
-        
-        .login-card button {
-            width: 100%;
-            padding: 15px;
-            background: #ff9800;
+            background: #4285f4;
             border: none;
             border-radius: 50px;
             color: white;
             font-weight: bold;
             font-size: 16px;
             cursor: pointer;
-            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
             transition: 0.2s;
         }
         
-        .login-card button:hover {
-            background: #f57c00;
-            transform: translateY(-2px);
-        }
-        
-        .google-btn {
-            background: #4285f4 !important;
-            margin-top: 15px !important;
-        }
-        
         .google-btn:hover {
-            background: #3367d6 !important;
-        }
-        
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 25px 0;
-            color: #999;
-        }
-        
-        .divider::before, .divider::after {
-            content: "";
-            flex: 1;
-            height: 1px;
-            background: #ddd;
-        }
-        
-        .divider span {
-            padding: 0 15px;
+            background: #3367d6;
+            transform: translateY(-2px);
         }
         
         .error-msg {
@@ -131,32 +84,39 @@
             font-size: 14px;
         }
         
+        .info-box {
+            background: #f0f0f0;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 30px;
+            font-size: 13px;
+            color: #666;
+        }
+        
         /* Admin Panel Styles */
         .admin-content {
             display: none;
         }
         
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
         .header {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
             border-radius: 20px;
             padding: 15px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 25px;
-            flex-wrap: wrap;
+            color: white;
         }
         
         .logo h2 {
             color: #ff9800;
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            color: white;
         }
         
         .logout-btn {
@@ -176,10 +136,11 @@
         }
         
         .stat-card {
-            background: rgba(255,255,255,0.95);
+            background: white;
             border-radius: 20px;
             padding: 20px;
             text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .stat-number {
@@ -189,9 +150,10 @@
         }
         
         .main-card {
-            background: rgba(255,255,255,0.95);
+            background: white;
             border-radius: 20px;
             padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .tabs {
@@ -257,6 +219,7 @@
             border-radius: 15px;
             padding: 15px;
             position: relative;
+            border: 1px solid #eee;
         }
         
         .clip-artist {
@@ -296,6 +259,17 @@
             background: #f5f5f5;
         }
         
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        
+        .badge-admin {
+            background: #ff9800;
+            color: white;
+        }
+        
         .modal {
             display: none;
             position: fixed;
@@ -323,20 +297,15 @@
             cursor: pointer;
         }
         
-        .badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-        }
-        
-        .badge-admin {
-            background: #ff9800;
-            color: white;
-        }
-        
         @media (max-width: 768px) {
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
+            }
+            .tabs {
+                flex-direction: column;
+            }
+            .tab {
+                text-align: center;
             }
         }
     </style>
@@ -348,104 +317,102 @@
             <h2>🔐 Admin Login</h2>
             <p>Ingia kwenye Admin Panel ya Joowzey Livestream</p>
             
-            <input type="email" id="adminEmail" placeholder="Barua pepe ya admin">
-            <input type="password" id="adminPassword" placeholder="Nenosiri">
-            <button id="loginBtn">Ingia kwa Email</button>
-            
-            <div class="divider">
-                <span>au</span>
-            </div>
-            
             <button id="googleLoginBtn" class="google-btn">
                 <i class="fab fa-google"></i> Ingia kwa Google
             </button>
             
             <div id="loginError" class="error-msg"></div>
+            
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i> Tafadhali ingia kwa akaunti ya Google: <strong>joowzeyemailofficial@gmail.com</strong>
+            </div>
         </div>
     </div>
     
-    <!-- Admin Panel (hidden until login) -->
-    <div id="adminPanel" class="container" style="display: none;">
-        <div class="header">
-            <div class="logo">
-                <h2>🎬 Joowzey Livestream - Admin Panel</h2>
-            </div>
-            <div class="user-info">
-                <span><i class="fas fa-user-shield"></i> <span id="adminName">Admin</span></span>
-                <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Toka</button>
-            </div>
-        </div>
-        
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-number" id="totalUsers">0</div>
-                <div>Watumiaji</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="totalClips">0</div>
-                <div>Clips</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="totalVotes">0</div>
-                <div>Kura</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="spotlightCount">0</div>
-                <div>Spotlight</div>
-            </div>
-        </div>
-        
-        <div class="main-card">
-            <div class="tabs">
-                <div class="tab active" data-tab="clips">🎵 Clips</div>
-                <div class="tab" data-tab="addClip">➕ Ongeza Clip</div>
-                <div class="tab" data-tab="users">👥 Watumiaji</div>
-                <div class="tab" data-tab="spotlight">⭐ Spotlight</div>
-            </div>
-            
-            <div id="tabClips">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                    <h3>Orodha ya Clips</h3>
-                    <button class="btn-primary" id="goToAddClipBtn">+ Clip Mpya</button>
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="admin-content">
+        <div class="container">
+            <div class="header">
+                <div class="logo">
+                    <h2>🎬 Joowzey Livestream - Admin Panel</h2>
                 </div>
-                <div id="clipsContainer" class="clips-grid">Loading...</div>
-            </div>
-            
-            <div id="tabAddClip" style="display: none;">
-                <h3>Ongeza Clip Mpya</h3>
-                <div class="input-group">
-                    <label>Jina la Msanii</label>
-                    <input type="text" id="artistName" placeholder="Mwasiti">
-                </div>
-                <div class="input-group">
-                    <label>Jina la Wimbo</label>
-                    <input type="text" id="songTitle" placeholder="Nakupenda">
-                </div>
-                <div class="input-group">
-                    <label>Muda (sekunde)</label>
-                    <input type="number" id="duration" placeholder="45">
-                </div>
-                <button class="btn-primary" id="addClipBtn">Hifadhi Clip</button>
-            </div>
-            
-            <div id="tabUsers" style="display: none;">
-                <h3>Watumiaji Waliojiandikisha</h3>
-                <div style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr><th>Jina</th><th>Email</th><th>Role</th><th>Tarehe</th></tr>
-                        </thead>
-                        <tbody id="usersTableBody"></tbody>
-                    </table>
+                <div class="user-info">
+                    <span><i class="fas fa-user-shield"></i> <span id="adminName">Admin</span></span>
+                    <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Toka</button>
                 </div>
             </div>
             
-            <div id="tabSpotlight" style="display: none;">
-                <h3>Guest Spotlight</h3>
-                <p>Washiriki: <span id="spotlightParticipantsCount">0</span></p>
-                <div id="spotlightList" style="margin: 15px 0; max-height: 200px; overflow-y: auto; background: #f5f5f5; padding: 10px; border-radius: 10px;"></div>
-                <button class="btn-primary" id="pickWinnerBtn">🏆 Chagua Mshindi</button>
-                <div id="winnerResult" style="margin-top: 15px;"></div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalUsers">0</div>
+                    <div>Watumiaji</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalClips">0</div>
+                    <div>Clips</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalVotes">0</div>
+                    <div>Kura</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="spotlightCount">0</div>
+                    <div>Spotlight</div>
+                </div>
+            </div>
+            
+            <div class="main-card">
+                <div class="tabs">
+                    <div class="tab active" data-tab="clips">🎵 Clips</div>
+                    <div class="tab" data-tab="addClip">➕ Ongeza Clip</div>
+                    <div class="tab" data-tab="users">👥 Watumiaji</div>
+                    <div class="tab" data-tab="spotlight">⭐ Spotlight</div>
+                </div>
+                
+                <div id="tabClips">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                        <h3>Orodha ya Clips</h3>
+                        <button class="btn-primary" id="goToAddClipBtn">+ Clip Mpya</button>
+                    </div>
+                    <div id="clipsContainer" class="clips-grid">Loading...</div>
+                </div>
+                
+                <div id="tabAddClip" style="display: none;">
+                    <h3>Ongeza Clip Mpya</h3>
+                    <div class="input-group">
+                        <label>Jina la Msanii</label>
+                        <input type="text" id="artistName" placeholder="Mwasiti">
+                    </div>
+                    <div class="input-group">
+                        <label>Jina la Wimbo</label>
+                        <input type="text" id="songTitle" placeholder="Nakupenda">
+                    </div>
+                    <div class="input-group">
+                        <label>Muda (sekunde)</label>
+                        <input type="number" id="duration" placeholder="45">
+                    </div>
+                    <button class="btn-primary" id="addClipBtn">Hifadhi Clip</button>
+                </div>
+                
+                <div id="tabUsers" style="display: none;">
+                    <h3>Watumiaji Waliojiandikisha</h3>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr><th>Jina</th><th>Email</th><th>Role</th><th>Tarehe</th></tr>
+                            </thead>
+                            <tbody id="usersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div id="tabSpotlight" style="display: none;">
+                    <h3>Guest Spotlight</h3>
+                    <p>Washiriki: <span id="spotlightParticipantsCount">0</span></p>
+                    <div id="spotlightList" style="margin: 15px 0; max-height: 200px; overflow-y: auto; background: #f5f5f5; padding: 10px; border-radius: 10px;"></div>
+                    <button class="btn-primary" id="pickWinnerBtn">🏆 Chagua Mshindi</button>
+                    <div id="winnerResult" style="margin-top: 15px;"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -487,27 +454,43 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
         
-        // ============ ADMIN EMAIL (Badilisha hapa) ============
-        const ADMIN_EMAIL = "joowzey@gmail.com";  // 🔴 Weka email yako mwenyewe
+        // ============ ADMIN EMAIL (ONLY THIS EMAIL CAN ACCESS) ============
+        const ADMIN_EMAIL = "joowzeyemailofficial@gmail.com";   // 🔴 Hakikisha hii ndiyo email yako ya admin
         
         let currentEditClipId = null;
         
-        // ============ LOGIN FUNCTIONS ============
-        async function handleAdminLogin(user) {
-            if (!user) return false;
+        // ============ GOOGLE LOGIN ============
+        async function loginWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            const errorDiv = document.getElementById('loginError');
             
-            // Check if email matches admin email
-            if (user.email !== ADMIN_EMAIL) {
-                await auth.signOut();
-                document.getElementById('loginError').innerText = "Akaunti hii sio ya admin. Wasiliana na mwenye mfumo.";
-                return false;
+            try {
+                const result = await auth.signInWithPopup(provider);
+                const user = result.user;
+                
+                // Check if the email matches the admin email
+                if (user.email !== ADMIN_EMAIL) {
+                    await auth.signOut();
+                    errorDiv.innerText = "Akaunti hii sio ya admin. Tafadhali ingia kwa akaunti: " + ADMIN_EMAIL;
+                    return;
+                }
+                
+                // Successful login - show admin panel
+                await handleAdminLogin(user);
+                
+            } catch (error) {
+                errorDiv.innerText = "Hitilafu: " + error.message;
             }
+        }
+        
+        async function handleAdminLogin(user) {
+            if (!user) return;
             
             // Ensure user has admin role in Firestore
             const userDoc = await db.collection('users').doc(user.uid).get();
             if (!userDoc.exists) {
                 await db.collection('users').doc(user.uid).set({
-                    name: "Admin",
+                    name: user.displayName || "Admin",
                     email: user.email,
                     role: "admin",
                     points: 0,
@@ -521,61 +504,13 @@
             // Show admin panel
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
-            document.getElementById('adminName').innerText = user.email.split('@')[0];
+            document.getElementById('adminName').innerHTML = user.email.split('@')[0];
             
             // Load all data
             await loadStats();
             await loadClips();
             await loadUsers();
             await loadSpotlight();
-            
-            return true;
-        }
-        
-        // Email/Password Login
-        async function loginWithEmail() {
-            const email = document.getElementById('adminEmail').value.trim();
-            const password = document.getElementById('adminPassword').value;
-            const errorDiv = document.getElementById('loginError');
-            
-            if (!email || !password) {
-                errorDiv.innerText = "Tafadhali jaza barua pepe na nenosiri";
-                return;
-            }
-            
-            try {
-                const userCred = await auth.signInWithEmailAndPassword(email, password);
-                await handleAdminLogin(userCred.user);
-            } catch (error) {
-                if (error.code === 'auth/user-not-found') {
-                    errorDiv.innerText = "Akaunti haipo. Hakikisha umesajiliwa kwenye mfumo.";
-                } else if (error.code === 'auth/wrong-password') {
-                    errorDiv.innerText = "Nenosiri si sahihi.";
-                } else {
-                    errorDiv.innerText = "Hitilafu: " + error.message;
-                }
-            }
-        }
-        
-        // Google Login
-        async function loginWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            const errorDiv = document.getElementById('loginError');
-            
-            try {
-                const result = await auth.signInWithPopup(provider);
-                const user = result.user;
-                
-                if (user.email !== ADMIN_EMAIL) {
-                    await auth.signOut();
-                    errorDiv.innerText = "Akaunti hii sio ya admin. Tafadhali ingia kwa akaunti ya admin.";
-                    return;
-                }
-                
-                await handleAdminLogin(user);
-            } catch (error) {
-                errorDiv.innerText = "Hitilafu: " + error.message;
-            }
         }
         
         // Logout
@@ -583,8 +518,6 @@
             await auth.signOut();
             document.getElementById('loginPage').style.display = 'flex';
             document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById('adminEmail').value = '';
-            document.getElementById('adminPassword').value = '';
             document.getElementById('loginError').innerText = '';
         }
         
@@ -619,8 +552,8 @@
                             <button class="edit-btn" onclick="openEditModal('${doc.id}')"><i class="fas fa-edit"></i></button>
                             <button class="delete-btn" onclick="deleteClip('${doc.id}')"><i class="fas fa-trash"></i></button>
                         </div>
-                        <div class="clip-artist">🎤 ${data.artistName || 'Msanii'}</div>
-                        <div>${data.songTitle || 'Wimbo'}</div>
+                        <div class="clip-artist">🎤 ${escapeHtml(data.artistName) || 'Msanii'}</div>
+                        <div>${escapeHtml(data.songTitle) || 'Wimbo'}</div>
                         <div><small>❤️ ${data.totalVotes || 0} kura</small></div>
                     </div>
                 `;
@@ -669,8 +602,8 @@
                 const createdAt = data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString() : '-';
                 html += `
                     <tr>
-                        <td>${data.name || '-'}</td>
-                        <td>${data.email || '-'}</td>
+                        <td>${escapeHtml(data.name) || '-'}</td>
+                        <td>${escapeHtml(data.email) || '-'}</td>
                         <td><span class="badge badge-admin">${data.role || 'fan'}</span></td>
                         <td>${createdAt}</td>
                     </tr>
@@ -692,7 +625,7 @@
             let html = '';
             for (const uid of participants) {
                 const user = await db.collection('users').doc(uid).get();
-                html += `<div>👤 ${user.exists ? user.data().name : uid}</div>`;
+                html += `<div>👤 ${user.exists ? escapeHtml(user.data().name) : uid}</div>`;
             }
             document.getElementById('spotlightList').innerHTML = html;
         }
@@ -708,7 +641,14 @@
             const userDoc = await db.collection('users').doc(winnerId).get();
             const winnerName = userDoc.exists ? userDoc.data().name : winnerId;
             await db.collection('guestSpotlight').doc('current').update({ winnerId, isDrawn: true });
-            document.getElementById('winnerResult').innerHTML = `<span style="color:green;">🏆 Mshindi: ${winnerName}</span>`;
+            document.getElementById('winnerResult').innerHTML = `<span style="color:green;">🏆 Mshindi: ${escapeHtml(winnerName)}</span>`;
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
         
         window.deleteClip = async (clipId) => {
@@ -772,7 +712,6 @@
         }
         
         // ============ EVENT LISTENERS ============
-        document.getElementById('loginBtn').addEventListener('click', loginWithEmail);
         document.getElementById('googleLoginBtn').addEventListener('click', loginWithGoogle);
         document.getElementById('logoutBtn').addEventListener('click', logoutAdmin);
         document.getElementById('addClipBtn').addEventListener('click', addClip);
@@ -786,15 +725,16 @@
             tab.addEventListener('click', () => switchTab(tab.getAttribute('data-tab')));
         });
         
-        // Enter key on password field
-        document.getElementById('adminPassword').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') loginWithEmail();
-        });
-        
-        // Check if already logged in
+        // Check if already logged in with the correct email
         auth.onAuthStateChanged(async (user) => {
             if (user && user.email === ADMIN_EMAIL) {
                 await handleAdminLogin(user);
+            } else if (user && user.email !== ADMIN_EMAIL) {
+                // Wrong user, sign out
+                await auth.signOut();
+                document.getElementById('loginPage').style.display = 'flex';
+                document.getElementById('adminPanel').style.display = 'none';
+                document.getElementById('loginError').innerText = "Akaunti hii sio ya admin. Tafadhali ingia kwa " + ADMIN_EMAIL;
             }
         });
     </script>
