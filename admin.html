@@ -33,7 +33,6 @@
             margin: 0 auto;
         }
         
-        /* Header */
         .header {
             background: rgba(255,255,255,0.1);
             backdrop-filter: blur(10px);
@@ -66,7 +65,6 @@
             cursor: pointer;
         }
         
-        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -100,7 +98,6 @@
             margin-top: 5px;
         }
         
-        /* Main Card */
         .main-card {
             background: rgba(255,255,255,0.95);
             border-radius: 20px;
@@ -108,7 +105,6 @@
             margin-bottom: 25px;
         }
         
-        /* Tabs */
         .tabs {
             display: flex;
             gap: 10px;
@@ -135,7 +131,6 @@
             color: white;
         }
         
-        /* Forms */
         .input-group {
             margin-bottom: 15px;
         }
@@ -184,7 +179,6 @@
             background: #b91c1c;
         }
         
-        /* Tables */
         .table-container {
             overflow-x: auto;
             max-height: 500px;
@@ -207,7 +201,6 @@
             font-weight: 600;
         }
         
-        /* Clips Grid */
         .clips-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -259,7 +252,6 @@
         .edit-btn { color: #ff9800; }
         .delete-btn { color: #dc2626; }
         
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -300,7 +292,6 @@
             color: #ff9800;
         }
         
-        /* Badge */
         .badge {
             padding: 4px 12px;
             border-radius: 20px;
@@ -318,6 +309,42 @@
             color: #666;
         }
         
+        /* Login form inside admin if not logged in */
+        .login-container {
+            max-width: 450px;
+            margin: 100px auto;
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .login-container input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            font-size: 16px;
+        }
+        
+        .login-container button {
+            width: 100%;
+            padding: 14px;
+            background: #ff9800;
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .error-msg {
+            color: red;
+            margin-top: 10px;
+        }
+        
         @media (max-width: 768px) {
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -333,101 +360,108 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="logo">
-                <h2>🎬 Joowzey Livestream - Admin Panel</h2>
+        <!-- Admin Panel Content (hidden until login) -->
+        <div id="adminContent" style="display: none;">
+            <div class="header">
+                <div class="logo">
+                    <h2>🎬 Joowzey Livestream - Admin Panel</h2>
+                </div>
+                <div class="user-info">
+                    <span><i class="fas fa-user-shield"></i> <span id="adminName">Admin</span></span>
+                    <button class="logout-btn" id="logoutAdminBtn"><i class="fas fa-sign-out-alt"></i> Toka</button>
+                </div>
             </div>
-            <div class="user-info">
-                <span><i class="fas fa-user-shield"></i> <span id="adminName">Admin</span></span>
-                <button class="logout-btn" id="logoutAdminBtn"><i class="fas fa-sign-out-alt"></i> Toka</button>
+            
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-users"></i>
+                    <div class="stat-number" id="totalUsers">0</div>
+                    <div class="stat-label">Watumiaji Jumla</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-video"></i>
+                    <div class="stat-number" id="totalClips">0</div>
+                    <div class="stat-label">Jumla ya Clips</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-heart"></i>
+                    <div class="stat-number" id="totalVotes">0</div>
+                    <div class="stat-label">Jumla ya Kura</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-star"></i>
+                    <div class="stat-number" id="spotlightCount">0</div>
+                    <div class="stat-label">Washiriki Spotlight</div>
+                </div>
+            </div>
+            
+            <!-- Main Card -->
+            <div class="main-card">
+                <div class="tabs">
+                    <div class="tab active" data-tab="clips">🎵 Clips</div>
+                    <div class="tab" data-tab="addClip">➕ Ongeza Clip</div>
+                    <div class="tab" data-tab="users">👥 Watumiaji</div>
+                    <div class="tab" data-tab="spotlight">⭐ Guest Spotlight</div>
+                </div>
+                
+                <div id="tabClips">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3>Orodha ya Clips</h3>
+                        <button class="btn-primary" id="goToAddClipBtn">+ Clip Mpya</button>
+                    </div>
+                    <div id="clipsContainer" class="clips-grid">Loading clips...</div>
+                </div>
+                
+                <div id="tabAddClip" style="display: none;">
+                    <h3>Ongeza Clip Mpya</h3>
+                    <div class="input-group">
+                        <label>Jina la Msanii</label>
+                        <input type="text" id="artistName" placeholder="Mwasiti">
+                    </div>
+                    <div class="input-group">
+                        <label>Jina la Wimbo</label>
+                        <input type="text" id="songTitle" placeholder="Nakupenda">
+                    </div>
+                    <div class="input-group">
+                        <label>Muda (sekunde)</label>
+                        <input type="number" id="duration" placeholder="45">
+                    </div>
+                    <button class="btn-primary" id="addClipBtn">Hifadhi Clip</button>
+                </div>
+                
+                <div id="tabUsers" style="display: none;">
+                    <h3>Watumiaji Waliojiandikisha</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr><th>Jina</th><th>Email</th><th>Role</th><th>Tarehe</th><th>Pointi</th></tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <tr><td colspan="5">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div id="tabSpotlight" style="display: none;">
+                    <h3>Guest Spotlight</h3>
+                    <p><strong>Washiriki waliojiunga:</strong> <span id="spotlightParticipantsCount">0</span></p>
+                    <div id="spotlightList" style="margin: 15px 0; max-height: 200px; overflow-y: auto; background: #f5f5f5; padding: 10px; border-radius: 10px;"></div>
+                    <button class="btn-primary" id="pickWinnerBtn">🏆 Chagua Mshindi</button>
+                    <div id="winnerResult" style="margin-top: 15px; padding: 10px; background: #f0f0f0; border-radius: 10px;"></div>
+                </div>
             </div>
         </div>
         
-        <!-- Stats Cards -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <i class="fas fa-users"></i>
-                <div class="stat-number" id="totalUsers">0</div>
-                <div class="stat-label">Watumiaji Jumla</div>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-video"></i>
-                <div class="stat-number" id="totalClips">0</div>
-                <div class="stat-label">Jumla ya Clips</div>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-heart"></i>
-                <div class="stat-number" id="totalVotes">0</div>
-                <div class="stat-label">Jumla ya Kura</div>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-star"></i>
-                <div class="stat-number" id="spotlightCount">0</div>
-                <div class="stat-label">Washiriki Spotlight</div>
-            </div>
-        </div>
-        
-        <!-- Main Card -->
-        <div class="main-card">
-            <!-- Tabs -->
-            <div class="tabs">
-                <div class="tab active" data-tab="clips">🎵 Clips</div>
-                <div class="tab" data-tab="addClip">➕ Ongeza Clip</div>
-                <div class="tab" data-tab="users">👥 Watumiaji</div>
-                <div class="tab" data-tab="spotlight">⭐ Guest Spotlight</div>
-            </div>
-            
-            <!-- Tab Content: Clips -->
-            <div id="tabClips">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3>Orodha ya Clips</h3>
-                    <button class="btn-primary" id="goToAddClipBtn">+ Clip Mpya</button>
-                </div>
-                <div id="clipsContainer" class="clips-grid">Loading clips...</div>
-            </div>
-            
-            <!-- Tab Content: Add Clip -->
-            <div id="tabAddClip" style="display: none;">
-                <h3>Ongeza Clip Mpya</h3>
-                <div class="input-group">
-                    <label>Jina la Msanii</label>
-                    <input type="text" id="artistName" placeholder="Mwasiti">
-                </div>
-                <div class="input-group">
-                    <label>Jina la Wimbo</label>
-                    <input type="text" id="songTitle" placeholder="Nakupenda">
-                </div>
-                <div class="input-group">
-                    <label>Muda (sekunde)</label>
-                    <input type="number" id="duration" placeholder="45">
-                </div>
-                <button class="btn-primary" id="addClipBtn">Hifadhi Clip</button>
-            </div>
-            
-            <!-- Tab Content: Users -->
-            <div id="tabUsers" style="display: none;">
-                <h3>Watumiaji Waliojiandikisha</h3>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr><th>Jina</th><th>Email</th><th>Role</th><th>Tarehe</th><th>Pointi</th></tr>
-                        </thead>
-                        <tbody id="usersTableBody">
-                            <tr><td colspan="5">Loading...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <!-- Tab Content: Spotlight -->
-            <div id="tabSpotlight" style="display: none;">
-                <h3>Guest Spotlight</h3>
-                <p><strong>Washiriki waliojiunga:</strong> <span id="spotlightParticipantsCount">0</span></p>
-                <div id="spotlightList" style="margin: 15px 0; max-height: 200px; overflow-y: auto; background: #f5f5f5; padding: 10px; border-radius: 10px;"></div>
-                <button class="btn-primary" id="pickWinnerBtn">🏆 Chagua Mshindi</button>
-                <div id="winnerResult" style="margin-top: 15px; padding: 10px; background: #f0f0f0; border-radius: 10px;"></div>
-            </div>
+        <!-- Login Form (shown when not logged in as admin) -->
+        <div id="loginFormContainer" class="login-container">
+            <h2>🔐 Admin Login</h2>
+            <p style="color: #666; margin-bottom: 20px;">Ingia kwa akaunti yako ya admin</p>
+            <input type="email" id="adminEmail" placeholder="Barua pepe ya admin">
+            <input type="password" id="adminPassword" placeholder="Nenosiri">
+            <button id="adminLoginBtn">Ingia</button>
+            <div id="loginErrorMsg" class="error-msg"></div>
         </div>
     </div>
     
@@ -472,24 +506,25 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
         
-        // Global variables
+        // ============ EMAIL YA ADMIN (BADILISHA HAPA) ============
+        // Weka email yako hapa chini - huyu ndiye pekee atakayeruhusiwa
+        const ADMIN_EMAIL = "joowzey@gmail.com";  // 🔴 BADILISHA HAPA na email yako mwenyewe
+        
+        // ============ GLOBAL VARIABLES ============
         let currentUser = null;
         let currentEditClipId = null;
         
-        // ============ TAB SWITCHING FUNCTION ============
+        // ============ SWITCH TABS ============
         function switchTab(tabName) {
-            // Hide all tab contents
             document.getElementById('tabClips').style.display = 'none';
             document.getElementById('tabAddClip').style.display = 'none';
             document.getElementById('tabUsers').style.display = 'none';
             document.getElementById('tabSpotlight').style.display = 'none';
             
-            // Remove active class from all tabs
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.classList.remove('active');
             });
             
-            // Show selected tab content and highlight tab
             if (tabName === 'clips') {
                 document.getElementById('tabClips').style.display = 'block';
                 document.querySelector('.tab[data-tab="clips"]').classList.add('active');
@@ -770,39 +805,123 @@
             return div.innerHTML;
         }
         
-        // ============ AUTH STATE LISTENER ============
+        function showAdminContent() {
+            document.getElementById('adminContent').style.display = 'block';
+            document.getElementById('loginFormContainer').style.display = 'none';
+        }
+        
+        function showLoginForm() {
+            document.getElementById('adminContent').style.display = 'none';
+            document.getElementById('loginFormContainer').style.display = 'block';
+        }
+        
+        // ============ ADMIN LOGIN ============
+        async function loginAsAdmin() {
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value;
+            const errorDiv = document.getElementById('loginErrorMsg');
+            
+            if (!email || !password) {
+                errorDiv.innerText = "Tafadhali jaza barua pepe na nenosiri";
+                return;
+            }
+            
+            // Check if email matches the predefined admin email
+            if (email !== ADMIN_EMAIL) {
+                errorDiv.innerText = "Barua pepe hii si ya admin. Wasiliana na mwenye mfumo.";
+                return;
+            }
+            
+            try {
+                // Try to sign in
+                const userCred = await auth.signInWithEmailAndPassword(email, password);
+                const user = userCred.user;
+                
+                // Check or create admin document in Firestore
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (!userDoc.exists) {
+                    await db.collection('users').doc(user.uid).set({
+                        name: "Admin",
+                        email: email,
+                        role: "admin",
+                        points: 0,
+                        badges: ["admin"],
+                        createdAt: new Date()
+                    });
+                } else {
+                    // Ensure role is admin
+                    if (userDoc.data().role !== 'admin') {
+                        await db.collection('users').doc(user.uid).update({
+                            role: "admin"
+                        });
+                    }
+                }
+                
+                errorDiv.innerText = "";
+                showAdminContent();
+                document.getElementById('adminName').innerText = "Admin";
+                
+                // Load all data
+                await loadStats();
+                await loadClips();
+                await loadUsers();
+                await loadSpotlight();
+                
+            } catch (error) {
+                console.error("Login error:", error);
+                if (error.code === 'auth/user-not-found') {
+                    errorDiv.innerText = "Akaunti haipo. Hakikisha umesajiliwa kwenye mfumo.";
+                } else if (error.code === 'auth/wrong-password') {
+                    errorDiv.innerText = "Nenosiri si sahihi.";
+                } else {
+                    errorDiv.innerText = "Hitilafu: " + error.message;
+                }
+            }
+        }
+        
+        // ============ LOGOUT ============
+        async function logoutAdmin() {
+            await auth.signOut();
+            showLoginForm();
+            document.getElementById('adminEmail').value = '';
+            document.getElementById('adminPassword').value = '';
+        }
+        
+        // ============ CHECK AUTH STATE ============
         auth.onAuthStateChanged(async (user) => {
             if (user) {
-                try {
+                // Check if this user is the admin by email
+                if (user.email === ADMIN_EMAIL) {
+                    // Ensure role is admin in Firestore
                     const userDoc = await db.collection('users').doc(user.uid).get();
-                    const role = userDoc.exists ? userDoc.data().role : 'fan';
-                    const name = userDoc.exists ? userDoc.data().name : user.email;
-                    
-                    if (role !== 'admin') {
-                        alert("Siyo akaunti ya admin! Unaelekezwa kwenye ukurasa wa kuingia.");
-                        window.location.href = 'index.html';
-                        return;
+                    if (!userDoc.exists || userDoc.data().role !== 'admin') {
+                        await db.collection('users').doc(user.uid).set({
+                            name: "Admin",
+                            email: user.email,
+                            role: "admin",
+                            points: 0,
+                            badges: ["admin"],
+                            createdAt: new Date()
+                        }, { merge: true });
                     }
-                    
-                    currentUser = user;
-                    document.getElementById('adminName').innerText = name;
-                    
-                    // Load all data
+                    showAdminContent();
+                    document.getElementById('adminName').innerText = "Admin";
                     await loadStats();
                     await loadClips();
                     await loadUsers();
                     await loadSpotlight();
-                    
-                } catch (error) {
-                    console.error("Error checking admin:", error);
+                } else {
+                    // Not the right admin email, sign out
+                    await auth.signOut();
+                    showLoginForm();
+                    document.getElementById('loginErrorMsg').innerText = "Akaunti hii haina ruhusa ya kuingia admin panel.";
                 }
             } else {
-                window.location.href = 'index.html';
+                showLoginForm();
             }
         });
         
         // ============ EVENT LISTENERS ============
-        // Tab switching
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 const tabName = tab.getAttribute('data-tab');
@@ -810,31 +929,27 @@
             });
         });
         
-        // Buttons
-        document.getElementById('logoutAdminBtn').addEventListener('click', async () => {
-            await auth.signOut();
-            window.location.href = 'index.html';
-        });
-        
-        document.getElementById('goToAddClipBtn').addEventListener('click', () => {
-            switchTab('addClip');
-        });
-        
+        document.getElementById('logoutAdminBtn').addEventListener('click', logoutAdmin);
+        document.getElementById('goToAddClipBtn').addEventListener('click', () => switchTab('addClip'));
         document.getElementById('addClipBtn').addEventListener('click', addClip);
         document.getElementById('updateClipBtn').addEventListener('click', updateClip);
         document.getElementById('deleteClipBtn').addEventListener('click', deleteCurrentClip);
         document.getElementById('pickWinnerBtn').addEventListener('click', pickSpotlightWinner);
         document.getElementById('closeEditModal').addEventListener('click', closeEditModal);
+        document.getElementById('adminLoginBtn').addEventListener('click', loginAsAdmin);
+        
+        // Allow Enter key on login form
+        document.getElementById('adminPassword').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') loginAsAdmin();
+        });
         
         // Close modal when clicking outside
         window.addEventListener('click', (e) => {
             const modal = document.getElementById('editModal');
-            if (e.target === modal) {
-                closeEditModal();
-            }
+            if (e.target === modal) closeEditModal();
         });
         
-        // Start with clips tab
+        // Start with clips tab when admin content is shown
         switchTab('clips');
     </script>
 </body>
