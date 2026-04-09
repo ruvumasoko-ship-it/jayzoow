@@ -69,9 +69,9 @@
         /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         
         .stat-card {
@@ -83,7 +83,7 @@
         }
         
         .stat-card i {
-            font-size: 35px;
+            font-size: 30px;
             color: #ff9800;
             margin-bottom: 10px;
         }
@@ -91,7 +91,7 @@
         .stat-number {
             font-size: 28px;
             font-weight: bold;
-            color: #1a1a2e;
+            color: #ff9800;
         }
         
         .stat-label {
@@ -119,10 +119,11 @@
         }
         
         .tab {
-            padding: 10px 20px;
+            padding: 10px 25px;
             cursor: pointer;
             border-radius: 30px;
             transition: 0.2s;
+            font-weight: 500;
         }
         
         .tab:hover {
@@ -143,14 +144,20 @@
             display: block;
             margin-bottom: 5px;
             font-weight: 500;
+            color: #333;
         }
         
         .input-group input, .input-group textarea {
             width: 100%;
-            padding: 12px;
+            padding: 12px 15px;
             border: 1px solid #ddd;
             border-radius: 10px;
             font-size: 14px;
+            outline: none;
+        }
+        
+        .input-group input:focus {
+            border-color: #ff9800;
         }
         
         .btn-primary {
@@ -161,15 +168,27 @@
             color: white;
             font-weight: bold;
             cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background: #f57c00;
+            transform: translateY(-2px);
         }
         
         .btn-danger {
             background: #dc2626;
         }
         
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+        
         /* Tables */
         .table-container {
             overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
         }
         
         table {
@@ -185,6 +204,7 @@
         
         th {
             background: #f5f5f5;
+            font-weight: 600;
         }
         
         /* Clips Grid */
@@ -199,12 +219,26 @@
             border-radius: 15px;
             padding: 15px;
             position: relative;
+            transition: 0.2s;
+            border: 1px solid #eee;
+        }
+        
+        .clip-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .clip-artist {
             font-size: 18px;
             font-weight: bold;
             color: #ff9800;
+            margin-bottom: 5px;
+        }
+        
+        .clip-title {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
         }
         
         .clip-actions {
@@ -219,6 +253,7 @@
             cursor: pointer;
             margin-left: 8px;
             font-size: 16px;
+            padding: 5px;
         }
         
         .edit-btn { color: #ff9800; }
@@ -251,11 +286,36 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
         }
         
         .close-modal {
             font-size: 24px;
             cursor: pointer;
+            color: #999;
+        }
+        
+        .close-modal:hover {
+            color: #ff9800;
+        }
+        
+        /* Badge */
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-admin {
+            background: #ff9800;
+            color: white;
+        }
+        
+        .badge-fan {
+            background: #e0e0e0;
+            color: #666;
         }
         
         @media (max-width: 768px) {
@@ -265,6 +325,9 @@
             .tabs {
                 flex-direction: column;
             }
+            .tab {
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -273,11 +336,11 @@
         <!-- Header -->
         <div class="header">
             <div class="logo">
-                <h2>🎬 Joowzey Livestream - Admin</h2>
+                <h2>🎬 Joowzey Livestream - Admin Panel</h2>
             </div>
             <div class="user-info">
                 <span><i class="fas fa-user-shield"></i> <span id="adminName">Admin</span></span>
-                <button class="logout-btn" onclick="logoutAdmin()"><i class="fas fa-sign-out-alt"></i> Toka</button>
+                <button class="logout-btn" id="logoutAdminBtn"><i class="fas fa-sign-out-alt"></i> Toka</button>
             </div>
         </div>
         
@@ -287,16 +350,6 @@
                 <i class="fas fa-users"></i>
                 <div class="stat-number" id="totalUsers">0</div>
                 <div class="stat-label">Watumiaji Jumla</div>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-microphone-alt"></i>
-                <div class="stat-number" id="totalArtists">0</div>
-                <div class="stat-label">Wasanii</div>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-headphones"></i>
-                <div class="stat-number" id="totalFans">0</div>
-                <div class="stat-label">Mashabiki</div>
             </div>
             <div class="stat-card">
                 <i class="fas fa-video"></i>
@@ -317,24 +370,24 @@
         
         <!-- Main Card -->
         <div class="main-card">
+            <!-- Tabs -->
             <div class="tabs">
-                <div class="tab active" onclick="switchTab('clips')">🎵 Clips</div>
-                <div class="tab" onclick="switchTab('addClip')">➕ Ongeza Clip</div>
-                <div class="tab" onclick="switchTab('users')">👥 Watumiaji</div>
-                <div class="tab" onclick="switchTab('spotlight')">⭐ Guest Spotlight</div>
-                <div class="tab" onclick="switchTab('stats')">📊 Takwimu</div>
+                <div class="tab active" data-tab="clips">🎵 Clips</div>
+                <div class="tab" data-tab="addClip">➕ Ongeza Clip</div>
+                <div class="tab" data-tab="users">👥 Watumiaji</div>
+                <div class="tab" data-tab="spotlight">⭐ Guest Spotlight</div>
             </div>
             
-            <!-- Tab: Clips -->
+            <!-- Tab Content: Clips -->
             <div id="tabClips">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h3>Orodha ya Clips</h3>
-                    <button class="btn-primary" onclick="switchTab('addClip')">+ Clip Mpya</button>
+                    <button class="btn-primary" id="goToAddClipBtn">+ Clip Mpya</button>
                 </div>
                 <div id="clipsContainer" class="clips-grid">Loading clips...</div>
             </div>
             
-            <!-- Tab: Add Clip -->
+            <!-- Tab Content: Add Clip -->
             <div id="tabAddClip" style="display: none;">
                 <h3>Ongeza Clip Mpya</h3>
                 <div class="input-group">
@@ -349,10 +402,10 @@
                     <label>Muda (sekunde)</label>
                     <input type="number" id="duration" placeholder="45">
                 </div>
-                <button class="btn-primary" onclick="addClip()">Hifadhi Clip</button>
+                <button class="btn-primary" id="addClipBtn">Hifadhi Clip</button>
             </div>
             
-            <!-- Tab: Users -->
+            <!-- Tab Content: Users -->
             <div id="tabUsers" style="display: none;">
                 <h3>Watumiaji Waliojiandikisha</h3>
                 <div class="table-container">
@@ -360,34 +413,30 @@
                         <thead>
                             <tr><th>Jina</th><th>Email</th><th>Role</th><th>Tarehe</th><th>Pointi</th></tr>
                         </thead>
-                        <tbody id="usersTable"></tbody>
+                        <tbody id="usersTableBody">
+                            <tr><td colspan="5">Loading...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
             
-            <!-- Tab: Spotlight -->
+            <!-- Tab Content: Spotlight -->
             <div id="tabSpotlight" style="display: none;">
                 <h3>Guest Spotlight</h3>
                 <p><strong>Washiriki waliojiunga:</strong> <span id="spotlightParticipantsCount">0</span></p>
-                <div id="spotlightList" style="margin: 15px 0; max-height: 200px; overflow-y: auto;"></div>
-                <button class="btn-primary" onclick="pickWinner()">🏆 Chagua Mshindi</button>
+                <div id="spotlightList" style="margin: 15px 0; max-height: 200px; overflow-y: auto; background: #f5f5f5; padding: 10px; border-radius: 10px;"></div>
+                <button class="btn-primary" id="pickWinnerBtn">🏆 Chagua Mshindi</button>
                 <div id="winnerResult" style="margin-top: 15px; padding: 10px; background: #f0f0f0; border-radius: 10px;"></div>
-            </div>
-            
-            <!-- Tab: Stats -->
-            <div id="tabStats" style="display: none;">
-                <h3>Takwimu za Kura</h3>
-                <canvas id="votesChart" style="max-height: 300px;"></canvas>
             </div>
         </div>
     </div>
     
-    <!-- Edit Modal -->
+    <!-- Edit Clip Modal -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Hariri Clip</h3>
-                <span class="close-modal" onclick="closeModal()">&times;</span>
+                <span class="close-modal" id="closeEditModal">&times;</span>
             </div>
             <input type="hidden" id="editClipId">
             <div class="input-group">
@@ -402,267 +451,391 @@
                 <label>Muda (sekunde)</label>
                 <input type="number" id="editDuration">
             </div>
-            <button class="btn-primary" onclick="updateClip()">Hifadhi</button>
-            <button class="btn-primary btn-danger" onclick="deleteClip()" style="margin-top: 10px;">Futa Clip</button>
+            <button class="btn-primary" id="updateClipBtn">Hifadhi Mabadiliko</button>
+            <button class="btn-primary btn-danger" id="deleteClipBtn" style="margin-top: 10px;">Futa Clip</button>
         </div>
     </div>
 
-    <script src="firebase-config.js"></script>
     <script>
-        let currentUser = null;
-        let votesChart = null;
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBRDOjngQ2aMKmyO-hltQmpXkcsmzYH4xE",
+            authDomain: "joowzeylivesteam.firebaseapp.com",
+            projectId: "joowzeylivesteam",
+            storageBucket: "joowzeylivesteam.firebasestorage.app",
+            messagingSenderId: "214467755859",
+            appId: "1:214467755859:web:8208af7207ae13592f2ba6"
+        };
         
-        // Check if user is admin on page load
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                const userDoc = await db.collection('users').doc(user.uid).get();
-                const role = userDoc.exists ? userDoc.data().role : 'fan';
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // Global variables
+        let currentUser = null;
+        let currentEditClipId = null;
+        
+        // ============ TAB SWITCHING FUNCTION ============
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.getElementById('tabClips').style.display = 'none';
+            document.getElementById('tabAddClip').style.display = 'none';
+            document.getElementById('tabUsers').style.display = 'none';
+            document.getElementById('tabSpotlight').style.display = 'none';
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content and highlight tab
+            if (tabName === 'clips') {
+                document.getElementById('tabClips').style.display = 'block';
+                document.querySelector('.tab[data-tab="clips"]').classList.add('active');
+                loadClips();
+            } else if (tabName === 'addClip') {
+                document.getElementById('tabAddClip').style.display = 'block';
+                document.querySelector('.tab[data-tab="addClip"]').classList.add('active');
+            } else if (tabName === 'users') {
+                document.getElementById('tabUsers').style.display = 'block';
+                document.querySelector('.tab[data-tab="users"]').classList.add('active');
+                loadUsers();
+            } else if (tabName === 'spotlight') {
+                document.getElementById('tabSpotlight').style.display = 'block';
+                document.querySelector('.tab[data-tab="spotlight"]').classList.add('active');
+                loadSpotlight();
+            }
+        }
+        
+        // ============ LOAD STATS ============
+        async function loadStats() {
+            try {
+                const usersSnapshot = await db.collection('users').get();
+                const clipsSnapshot = await db.collection('clips').get();
+                const spotlightDoc = await db.collection('guestSpotlight').doc('current').get();
                 
-                if (role !== 'admin') {
-                    alert("Siyo akaunti ya admin! Unaelekezwa kwenye ukurasa wa kuingia.");
-                    window.location.href = 'index.html';
+                let totalVotes = 0;
+                clipsSnapshot.forEach(doc => {
+                    totalVotes += (doc.data().totalVotes || 0);
+                });
+                
+                document.getElementById('totalUsers').innerText = usersSnapshot.size;
+                document.getElementById('totalClips').innerText = clipsSnapshot.size;
+                document.getElementById('totalVotes').innerText = totalVotes;
+                document.getElementById('spotlightCount').innerText = spotlightDoc.exists ? (spotlightDoc.data().participants || []).length : 0;
+            } catch (error) {
+                console.error("Error loading stats:", error);
+            }
+        }
+        
+        // ============ LOAD CLIPS ============
+        async function loadClips() {
+            const container = document.getElementById('clipsContainer');
+            container.innerHTML = '<div class="clip-card">Loading clips...</div>';
+            
+            try {
+                const snapshot = await db.collection('clips').get();
+                if (snapshot.empty) {
+                    container.innerHTML = '<div class="clip-card">Hakuna clips. Ongeza clip mpya.</div>';
                     return;
                 }
                 
-                currentUser = user;
-                document.getElementById('adminName').innerText = userDoc.data().name || user.email;
-                loadAllData();
+                let html = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    html += `
+                        <div class="clip-card">
+                            <div class="clip-actions">
+                                <button class="edit-btn" onclick="openEditModal('${doc.id}')"><i class="fas fa-edit"></i></button>
+                                <button class="delete-btn" onclick="deleteClip('${doc.id}')"><i class="fas fa-trash"></i></button>
+                            </div>
+                            <div class="clip-artist">🎤 ${escapeHtml(data.artistName) || 'Msanii'}</div>
+                            <div class="clip-title">${escapeHtml(data.songTitle) || 'Wimbo'}</div>
+                            <div><small>❤️ ${data.totalVotes || 0} kura | ⏱️ ${data.duration || 0} sec</small></div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } catch (error) {
+                console.error("Error loading clips:", error);
+                container.innerHTML = '<div class="clip-card">Error loading clips</div>';
+            }
+        }
+        
+        // ============ ADD CLIP ============
+        async function addClip() {
+            const artistName = document.getElementById('artistName').value.trim();
+            const songTitle = document.getElementById('songTitle').value.trim();
+            const duration = parseInt(document.getElementById('duration').value) || 0;
+            
+            if (!artistName || !songTitle) {
+                alert("Tafadhali jaza jina la msanii na wimbo!");
+                return;
+            }
+            
+            try {
+                await db.collection('clips').add({
+                    artistName: artistName,
+                    songTitle: songTitle,
+                    duration: duration,
+                    totalVotes: 0,
+                    liveDate: new Date()
+                });
+                
+                alert("Clip imeongezwa kikamilifu!");
+                document.getElementById('artistName').value = '';
+                document.getElementById('songTitle').value = '';
+                document.getElementById('duration').value = '';
+                
+                loadClips();
+                loadStats();
+                switchTab('clips');
+            } catch (error) {
+                console.error("Error adding clip:", error);
+                alert("Hitilafu: " + error.message);
+            }
+        }
+        
+        // ============ EDIT CLIP ============
+        window.openEditModal = async function(clipId) {
+            currentEditClipId = clipId;
+            try {
+                const doc = await db.collection('clips').doc(clipId).get();
+                const data = doc.data();
+                document.getElementById('editArtistName').value = data.artistName || '';
+                document.getElementById('editSongTitle').value = data.songTitle || '';
+                document.getElementById('editDuration').value = data.duration || 0;
+                document.getElementById('editModal').style.display = 'flex';
+            } catch (error) {
+                console.error("Error loading clip:", error);
+            }
+        };
+        
+        async function updateClip() {
+            if (!currentEditClipId) return;
+            
+            const updatedData = {
+                artistName: document.getElementById('editArtistName').value.trim(),
+                songTitle: document.getElementById('editSongTitle').value.trim(),
+                duration: parseInt(document.getElementById('editDuration').value) || 0
+            };
+            
+            if (!updatedData.artistName || !updatedData.songTitle) {
+                alert("Jaza jina la msanii na wimbo!");
+                return;
+            }
+            
+            try {
+                await db.collection('clips').doc(currentEditClipId).update(updatedData);
+                alert("Clip imeharririwa!");
+                closeEditModal();
+                loadClips();
+            } catch (error) {
+                console.error("Error updating clip:", error);
+                alert("Hitilafu: " + error.message);
+            }
+        }
+        
+        window.deleteClip = async function(clipId) {
+            if (confirm("Una uhakika unataka kufuta clip hii?")) {
+                try {
+                    await db.collection('clips').doc(clipId).delete();
+                    alert("Clip imefutwa!");
+                    loadClips();
+                    loadStats();
+                } catch (error) {
+                    console.error("Error deleting clip:", error);
+                    alert("Hitilafu: " + error.message);
+                }
+            }
+        };
+        
+        async function deleteCurrentClip() {
+            if (currentEditClipId && confirm("Una uhakika unataka kufuta clip hii?")) {
+                try {
+                    await db.collection('clips').doc(currentEditClipId).delete();
+                    alert("Clip imefutwa!");
+                    closeEditModal();
+                    loadClips();
+                    loadStats();
+                } catch (error) {
+                    console.error("Error deleting clip:", error);
+                    alert("Hitilafu: " + error.message);
+                }
+            }
+        }
+        
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            currentEditClipId = null;
+        }
+        
+        // ============ LOAD USERS ============
+        async function loadUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
+            
+            try {
+                const snapshot = await db.collection('users').get();
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="5">Hakuna watumiaji</td></tr>';
+                    return;
+                }
+                
+                let html = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const roleClass = data.role === 'admin' ? 'badge-admin' : 'badge-fan';
+                    const createdAt = data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString() : '-';
+                    html += `
+                        <tr>
+                            <td>${escapeHtml(data.name) || '-'}</td>
+                            <td>${escapeHtml(data.email) || '-'}</td>
+                            <td><span class="badge ${roleClass}">${data.role || 'fan'}</span></td>
+                            <td>${createdAt}</td>
+                            <td>${data.points || 0}</td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html;
+            } catch (error) {
+                console.error("Error loading users:", error);
+                tbody.innerHTML = '<tr><td colspan="5">Error loading users</td></tr>';
+            }
+        }
+        
+        // ============ LOAD SPOTLIGHT ============
+        async function loadSpotlight() {
+            try {
+                const spotlightDoc = await db.collection('guestSpotlight').doc('current').get();
+                const participants = spotlightDoc.exists ? (spotlightDoc.data().participants || []) : [];
+                document.getElementById('spotlightParticipantsCount').innerText = participants.length;
+                
+                if (participants.length === 0) {
+                    document.getElementById('spotlightList').innerHTML = '<div>Hakuna washiriki bado</div>';
+                    return;
+                }
+                
+                let html = '';
+                for (const userId of participants) {
+                    try {
+                        const userDoc = await db.collection('users').doc(userId).get();
+                        const userName = userDoc.exists ? userDoc.data().name : userId;
+                        html += `<div style="padding: 8px; border-bottom: 1px solid #ddd;">👤 ${escapeHtml(userName)}</div>`;
+                    } catch (err) {
+                        html += `<div style="padding: 8px;">👤 ${userId}</div>`;
+                    }
+                }
+                document.getElementById('spotlightList').innerHTML = html;
+            } catch (error) {
+                console.error("Error loading spotlight:", error);
+            }
+        }
+        
+        // ============ PICK SPOTLIGHT WINNER ============
+        async function pickSpotlightWinner() {
+            try {
+                const spotlightDoc = await db.collection('guestSpotlight').doc('current').get();
+                const participants = spotlightDoc.exists ? (spotlightDoc.data().participants || []) : [];
+                
+                if (participants.length === 0) {
+                    document.getElementById('winnerResult').innerHTML = '<span style="color: red;">❌ Hakuna washiriki katika spotlight!</span>';
+                    return;
+                }
+                
+                const winnerId = participants[Math.floor(Math.random() * participants.length)];
+                const userDoc = await db.collection('users').doc(winnerId).get();
+                const winnerName = userDoc.exists ? userDoc.data().name : winnerId;
+                
+                await db.collection('guestSpotlight').doc('current').update({
+                    winnerId: winnerId,
+                    isDrawn: true,
+                    drawDate: new Date()
+                });
+                
+                document.getElementById('winnerResult').innerHTML = `<span style="color: green; font-size: 16px;">🏆 Mshindi: ${escapeHtml(winnerName)} 🎉</span>`;
+                loadStats();
+            } catch (error) {
+                console.error("Error picking winner:", error);
+                document.getElementById('winnerResult').innerHTML = '<span style="color: red;">Hitilafu: ' + error.message + '</span>';
+            }
+        }
+        
+        // ============ HELPER FUNCTIONS ============
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // ============ AUTH STATE LISTENER ============
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                try {
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    const role = userDoc.exists ? userDoc.data().role : 'fan';
+                    const name = userDoc.exists ? userDoc.data().name : user.email;
+                    
+                    if (role !== 'admin') {
+                        alert("Siyo akaunti ya admin! Unaelekezwa kwenye ukurasa wa kuingia.");
+                        window.location.href = 'index.html';
+                        return;
+                    }
+                    
+                    currentUser = user;
+                    document.getElementById('adminName').innerText = name;
+                    
+                    // Load all data
+                    await loadStats();
+                    await loadClips();
+                    await loadUsers();
+                    await loadSpotlight();
+                    
+                } catch (error) {
+                    console.error("Error checking admin:", error);
+                }
             } else {
                 window.location.href = 'index.html';
             }
         });
         
-        async function loadAllData() {
-            await loadStats();
-            await loadClips();
-            await loadUsers();
-            await loadSpotlight();
-        }
-        
-        async function loadStats() {
-            const users = await db.collection('users').get();
-            const clips = await db.collection('clips').get();
-            const spotlight = await db.collection('guestSpotlight').doc('current').get();
-            
-            let artists = 0, fans = 0;
-            users.forEach(doc => {
-                if (doc.data().role === 'artist') artists++;
-                else fans++;
+        // ============ EVENT LISTENERS ============
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.getAttribute('data-tab');
+                switchTab(tabName);
             });
-            
-            let totalVotes = 0;
-            clips.forEach(doc => totalVotes += (doc.data().totalVotes || 0));
-            
-            document.getElementById('totalUsers').innerText = users.size;
-            document.getElementById('totalArtists').innerText = artists;
-            document.getElementById('totalFans').innerText = fans;
-            document.getElementById('totalClips').innerText = clips.size;
-            document.getElementById('totalVotes').innerText = totalVotes;
-            document.getElementById('spotlightCount').innerText = spotlight.exists ? (spotlight.data().participants || []).length : 0;
-        }
+        });
         
-        async function loadClips() {
-            const container = document.getElementById('clipsContainer');
-            const snapshot = await db.collection('clips').get();
-            
-            if (snapshot.empty) {
-                container.innerHTML = '<p>Hakuna clips. Ongeza clip mpya.</p>';
-                return;
-            }
-            
-            let html = '';
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                html += `
-                    <div class="clip-card">
-                        <div class="clip-actions">
-                            <button class="edit-btn" onclick="openEditModal('${doc.id}')"><i class="fas fa-edit"></i></button>
-                            <button class="delete-btn" onclick="deleteClipById('${doc.id}')"><i class="fas fa-trash"></i></button>
-                        </div>
-                        <div class="clip-artist">🎤 ${data.artistName || 'Msanii'}</div>
-                        <div>${data.songTitle || 'Wimbo'}</div>
-                        <div style="margin-top: 10px;"><small>❤️ ${data.totalVotes || 0} kura | ⏱️ ${data.duration || 0}s</small></div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-        
-        async function loadUsers() {
-            const tbody = document.getElementById('usersTable');
-            const snapshot = await db.collection('users').get();
-            
-            let html = '';
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                html += `
-                    <tr>
-                        <td>${data.name || '-'}</td>
-                        <td>${data.email || '-'}</td>
-                        <td><span style="background: ${data.role === 'admin' ? '#ff9800' : '#e0e0e0'}; padding: 3px 10px; border-radius: 20px;">${data.role || 'fan'}</span></td>
-                        <td>${data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString() : '-'}</td>
-                        <td>${data.points || 0}</td>
-                    </tr>
-                `;
-            });
-            tbody.innerHTML = html;
-        }
-        
-        async function loadSpotlight() {
-            const spotlight = await db.collection('guestSpotlight').doc('current').get();
-            const participants = spotlight.exists ? (spotlight.data().participants || []) : [];
-            document.getElementById('spotlightParticipantsCount').innerText = participants.length;
-            
-            let html = '';
-            for (const uid of participants) {
-                const user = await db.collection('users').doc(uid).get();
-                html += `<div style="padding: 8px; border-bottom: 1px solid #eee;">👤 ${user.exists ? user.data().name : uid}</div>`;
-            }
-            document.getElementById('spotlightList').innerHTML = html || '<div>Hakuna washiriki</div>';
-        }
-        
-        window.addClip = async function() {
-            const artistName = document.getElementById('artistName').value;
-            const songTitle = document.getElementById('songTitle').value;
-            const duration = parseInt(document.getElementById('duration').value);
-            
-            if (!artistName || !songTitle) {
-                alert("Jaza jina la msanii na wimbo!");
-                return;
-            }
-            
-            await db.collection('clips').add({
-                artistName: artistName,
-                songTitle: songTitle,
-                duration: duration || 0,
-                totalVotes: 0,
-                liveDate: new Date()
-            });
-            
-            alert("Clip imeongezwa!");
-            document.getElementById('artistName').value = '';
-            document.getElementById('songTitle').value = '';
-            document.getElementById('duration').value = '';
-            loadClips();
-            loadStats();
-        };
-        
-        window.openEditModal = async function(clipId) {
-            const doc = await db.collection('clips').doc(clipId).get();
-            const data = doc.data();
-            document.getElementById('editClipId').value = clipId;
-            document.getElementById('editArtistName').value = data.artistName || '';
-            document.getElementById('editSongTitle').value = data.songTitle || '';
-            document.getElementById('editDuration').value = data.duration || 0;
-            document.getElementById('editModal').style.display = 'flex';
-        };
-        
-        window.updateClip = async function() {
-            const clipId = document.getElementById('editClipId').value;
-            await db.collection('clips').doc(clipId).update({
-                artistName: document.getElementById('editArtistName').value,
-                songTitle: document.getElementById('editSongTitle').value,
-                duration: parseInt(document.getElementById('editDuration').value)
-            });
-            alert("Clip imeharririwa!");
-            closeModal();
-            loadClips();
-        };
-        
-        window.deleteClipById = async function(clipId) {
-            if (confirm("Una uhakika unataka kufuta clip hii?")) {
-                await db.collection('clips').doc(clipId).delete();
-                loadClips();
-                loadStats();
-            }
-        };
-        
-        window.deleteClip = async function() {
-            const clipId = document.getElementById('editClipId').value;
-            if (confirm("Una uhakika unataka kufuta?")) {
-                await db.collection('clips').doc(clipId).delete();
-                closeModal();
-                loadClips();
-                loadStats();
-            }
-        };
-        
-        window.pickWinner = async function() {
-            const spotlight = await db.collection('guestSpotlight').doc('current').get();
-            const participants = spotlight.exists ? (spotlight.data().participants || []) : [];
-            
-            if (participants.length === 0) {
-                document.getElementById('winnerResult').innerHTML = '<span style="color: red;">Hakuna washiriki!</span>';
-                return;
-            }
-            
-            const winnerId = participants[Math.floor(Math.random() * participants.length)];
-            const userDoc = await db.collection('users').doc(winnerId).get();
-            const winnerName = userDoc.exists ? userDoc.data().name : winnerId;
-            
-            await db.collection('guestSpotlight').doc('current').update({
-                winnerId: winnerId,
-                isDrawn: true,
-                drawDate: new Date()
-            });
-            
-            document.getElementById('winnerResult').innerHTML = `<span style="color: green; font-size: 18px;">🏆 Mshindi: ${winnerName} 🎉</span>`;
-            loadStats();
-        };
-        
-        window.switchTab = function(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            document.getElementById('tabClips').style.display = tab === 'clips' ? 'block' : 'none';
-            document.getElementById('tabAddClip').style.display = tab === 'addClip' ? 'block' : 'none';
-            document.getElementById('tabUsers').style.display = tab === 'users' ? 'block' : 'none';
-            document.getElementById('tabSpotlight').style.display = tab === 'spotlight' ? 'block' : 'none';
-            document.getElementById('tabStats').style.display = tab === 'stats' ? 'block' : 'none';
-            
-            if (tab === 'stats') loadChart();
-        };
-        
-        async function loadChart() {
-            const clips = await db.collection('clips').get();
-            const labels = [];
-            const votes = [];
-            clips.forEach(doc => {
-                labels.push(doc.data().artistName || 'Unknown');
-                votes.push(doc.data().totalVotes || 0);
-            });
-            
-            if (votesChart) votesChart.destroy();
-            const ctx = document.getElementById('votesChart').getContext('2d');
-            votesChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Kura',
-                        data: votes,
-                        backgroundColor: '#ff9800',
-                        borderRadius: 8
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: true }
-            });
-        }
-        
-        window.closeModal = function() {
-            document.getElementById('editModal').style.display = 'none';
-        };
-        
-        window.logoutAdmin = async function() {
+        // Buttons
+        document.getElementById('logoutAdminBtn').addEventListener('click', async () => {
             await auth.signOut();
             window.location.href = 'index.html';
-        };
+        });
         
-        // Close modal on outside click
-        window.onclick = function(e) {
+        document.getElementById('goToAddClipBtn').addEventListener('click', () => {
+            switchTab('addClip');
+        });
+        
+        document.getElementById('addClipBtn').addEventListener('click', addClip);
+        document.getElementById('updateClipBtn').addEventListener('click', updateClip);
+        document.getElementById('deleteClipBtn').addEventListener('click', deleteCurrentClip);
+        document.getElementById('pickWinnerBtn').addEventListener('click', pickSpotlightWinner);
+        document.getElementById('closeEditModal').addEventListener('click', closeEditModal);
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
             const modal = document.getElementById('editModal');
-            if (e.target === modal) closeModal();
-        };
+            if (e.target === modal) {
+                closeEditModal();
+            }
+        });
+        
+        // Start with clips tab
+        switchTab('clips');
     </script>
 </body>
 </html>
