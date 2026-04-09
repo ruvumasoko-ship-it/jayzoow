@@ -2,134 +2,785 @@
 <html lang="sw">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Joowzey Livestream</title>
-    <!-- Firebase Compat SDK (no module errors) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Joowzey Livestream - Shiriki Maonyesho</title>
+    
+    <!-- Firebase SDKs Compat -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'Inter',sans-serif;color:#fff;min-height:100vh;}
-        #bgVideo{position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:-2;}
-        .overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(3px);z-index:-1;}
-        .container{max-width:1280px;margin:0 auto;padding:0 24px;position:relative;z-index:2;}
-        .navbar{display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid rgba(255,255,255,0.2);}
-        .logo-area{display:flex;align-items:center;gap:12px;}
-        .logo-img{height:48px;width:auto;}
-        .brand-name{font-size:1.7rem;font-weight:800;background:linear-gradient(135deg,#FFF,#FFB347);-webkit-background-clip:text;background-clip:text;color:transparent;}
-        .btn-outline{background:transparent;border:1.5px solid rgba(255,255,255,0.8);padding:8px 24px;border-radius:40px;color:#fff;font-weight:600;cursor:pointer;transition:0.2s;}
-        .btn-outline:hover{background:rgba(255,255,255,0.2);}
-        .btn-primary{background:#ff9800;border:none;padding:10px 28px;border-radius:40px;font-weight:700;color:#1e1e2a;cursor:pointer;transition:0.2s;}
-        .btn-primary:hover{background:#f57c00;transform:translateY(-2px);}
-        .hero{text-align:center;padding:80px 20px 60px;}
-        .hero h1{font-size:3rem;font-weight:800;margin-bottom:20px;background:linear-gradient(135deg,#fff,#ffb347);-webkit-background-clip:text;background-clip:text;color:transparent;}
-        .hero p{font-size:1.2rem;max-width:650px;margin:0 auto 30px;}
-        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);backdrop-filter:blur(12px);justify-content:center;align-items:center;z-index:1000;}
-        .modal-card{background:#1e1e2a;border-radius:32px;padding:40px;width:90%;max-width:450px;text-align:center;position:relative;}
-        .close-modal{position:absolute;top:15px;right:20px;font-size:28px;cursor:pointer;color:#fff;}
-        .close-modal:hover{color:#ff9800;}
-        .social-btn{width:100%;padding:12px;margin:10px 0;border:none;border-radius:50px;font-weight:600;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;}
-        .google-btn{background:#fff;color:#333;}
-        .phone-btn{background:#34a853;color:#fff;}
-        .email-toggle{margin-top:20px;font-size:0.9rem;cursor:pointer;color:#ff9800;}
-        .email-form{margin-top:20px;display:none;}
-        .email-form input{width:100%;padding:12px;margin:8px 0;border-radius:50px;border:none;background:#2c2c3a;color:#fff;outline:none;}
-        .email-form input:focus{box-shadow:0 0 0 2px #ff9800;}
-        .message{padding:10px;border-radius:20px;margin-top:15px;display:none;}
-        .error{background:#dc3545cc;color:#fff;}
-        .success{background:#28a745cc;color:#fff;}
-        .welcome-card{background:rgba(0,0,0,0.5);backdrop-filter:blur(10px);border-radius:24px;padding:20px;margin:30px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;}
-        .clips-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:30px;margin:30px 0;}
-        .clip-card{background:rgba(20,20,35,0.9);backdrop-filter:blur(10px);border-radius:28px;padding:20px;transition:0.2s;}
-        .clip-card:hover{transform:translateY(-5px);}
-        .clip-artist{font-size:1.5rem;font-weight:bold;color:#ffb347;}
-        .clip-stats{display:flex;justify-content:space-between;align-items:center;margin-top:15px;}
-        .vote-btn{background:#ff5722;border:none;padding:6px 18px;border-radius:40px;font-weight:bold;color:#fff;cursor:pointer;}
-        .admin-panel{background:rgba(0,0,0,0.7);border-left:4px solid #ff9800;padding:20px;border-radius:20px;margin-top:40px;}
-        .footer-gallery{margin-top:80px;padding:40px 0;text-align:center;border-top:1px solid rgba(255,255,255,0.2);}
-        .gallery-title{font-size:1.5rem;margin-bottom:30px;}
-        .gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:25px;justify-items:center;}
-        .gallery-grid img{width:100%;max-width:300px;border-radius:24px;box-shadow:0 10px 20px rgba(0,0,0,0.3);}
-        @media(max-width:700px){.hero h1{font-size:2rem;}.brand-name{font-size:1.2rem;}}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Video background */
+        #bgVideo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+        }
+        
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(3px);
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Navigation */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-img {
+            height: 48px;
+            width: auto;
+        }
+        
+        .brand-name {
+            font-size: 1.7rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFFFFF, #FFB347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid rgba(255,255,255,0.8);
+            padding: 8px 28px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 14px;
+        }
+        
+        .btn-outline:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: #ff9800;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            border: none;
+            padding: 14px 40px;
+            border-radius: 50px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 100px 20px 80px;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff, #ffb347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 650px;
+            margin: 0 auto 35px;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        /* Modal - Login Form */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-card {
+            background: white;
+            border-radius: 32px;
+            width: 90%;
+            max-width: 460px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-header h2 {
+            font-size: 20px;
+            color: #1e1e2a;
+        }
+        
+        .close-modal {
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            transition: 0.2s;
+        }
+        
+        .close-modal:hover {
+            color: #ff9800;
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        /* Auth Tabs */
+        .auth-tabs {
+            display: flex;
+            gap: 10px;
+            background: #f5f5f5;
+            padding: 5px;
+            border-radius: 60px;
+            margin-bottom: 25px;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: 0.2s;
+            font-size: 14px;
+        }
+        
+        .auth-tab.active {
+            background: #ff9800;
+            color: white;
+            box-shadow: 0 2px 8px rgba(255,152,0,0.3);
+        }
+        
+        /* Input Groups */
+        .input-group {
+            display: flex;
+            align-items: center;
+            background: #f5f5f5;
+            border-radius: 50px;
+            margin-bottom: 16px;
+            padding: 0 20px;
+            transition: 0.2s;
+            border: 1px solid transparent;
+        }
+        
+        .input-group:focus-within {
+            border-color: #ff9800;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255,152,0,0.1);
+        }
+        
+        .input-icon {
+            color: #999;
+            font-size: 16px;
+        }
+        
+        .input-group input {
+            flex: 1;
+            padding: 15px 12px;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 14px;
+        }
+        
+        /* Error & Success */
+        .error-msg, .success-msg {
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .error-msg {
+            background: #fee2e2;
+            color: #dc2626;
+            border-left: 4px solid #dc2626;
+        }
+        
+        .success-msg {
+            background: #dcfce7;
+            color: #16a34a;
+            border-left: 4px solid #16a34a;
+        }
+        
+        /* Buttons */
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(255,152,0,0.4);
+        }
+        
+        .btn-google {
+            width: 100%;
+            padding: 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            color: #333;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 12px;
+            transition: 0.2s;
+        }
+        
+        .btn-google:hover {
+            background: #f5f5f5;
+            border-color: #ff9800;
+        }
+        
+        .btn-phone {
+            width: 100%;
+            padding: 12px;
+            background: #34a853;
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 12px;
+            transition: 0.2s;
+        }
+        
+        .btn-phone:hover {
+            background: #2d8e47;
+        }
+        
+        /* OTP Section */
+        .otp-section {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 20px;
+            display: none;
+        }
+        
+        .otp-input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .otp-input-group input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            outline: none;
+            text-align: center;
+            font-size: 18px;
+            letter-spacing: 4px;
+        }
+        
+        .small-btn {
+            padding: 12px 20px;
+            background: #ff9800;
+            border: none;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .forgot-link {
+            text-align: right;
+            margin: 10px 0 15px;
+        }
+        
+        .forgot-link a {
+            color: #ff9800;
+            font-size: 12px;
+            text-decoration: none;
+        }
+        
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .register-link a {
+            color: #ff9800;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .divider::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e0e0e0;
+        }
+        
+        .divider span {
+            background: white;
+            padding: 0 15px;
+            position: relative;
+            color: #999;
+            font-size: 12px;
+        }
+        
+        /* Footer Gallery */
+        .footer-gallery {
+            margin-top: 80px;
+            padding: 40px 0;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .gallery-title {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            justify-items: center;
+        }
+        
+        .gallery-grid img {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 24px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+        }
+        
+        .gallery-grid img:hover {
+            transform: scale(1.03);
+        }
+        
+        /* Dashboard */
+        #dashboardSection {
+            display: none;
+        }
+        
+        .dashboard-header {
+            background: rgba(255,255,255,0.95);
+            border-radius: 24px;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .dashboard-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .dashboard-logo i {
+            font-size: 28px;
+            color: #ff9800;
+        }
+        
+        .dashboard-logo h2 {
+            font-size: 20px;
+            color: #1e1e2a;
+        }
+        
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #333;
+        }
+        
+        .logout-btn {
+            background: #dc2626;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .clips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .clip-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 24px;
+            padding: 20px;
+            transition: 0.2s;
+        }
+        
+        .clip-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .clip-artist {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff9800;
+        }
+        
+        .clip-title {
+            color: #666;
+            margin: 8px 0;
+        }
+        
+        .clip-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .vote-btn {
+            background: #ff5722;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .admin-panel {
+            background: rgba(255,255,255,0.95);
+            border-radius: 24px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .admin-panel h4 {
+            color: #ff9800;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .brand-name {
+                font-size: 1.2rem;
+            }
+            .navbar {
+                flex-direction: column;
+                text-align: center;
+            }
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
     <video autoplay muted loop playsinline id="bgVideo">
         <source src="1.mp4" type="video/mp4">
     </video>
-    <div class="overlay"></div>
-
-    <div class="container">
-        <div class="navbar">
-            <div class="logo-area">
-                <img src="logo.png" class="logo-img" onerror="this.style.display='none'">
-                <span class="brand-name">Joowzey Livestream</span>
+    <div class="bg-overlay"></div>
+    
+    <!-- HOME PAGE (Visible before login) -->
+    <div id="homePage">
+        <div class="container">
+            <!-- Navigation -->
+            <div class="navbar">
+                <div class="logo-area">
+                    <img src="logo.png" class="logo-img" onerror="this.style.display='none'">
+                    <span class="brand-name">Joowzey Livestream</span>
+                </div>
+                <div class="nav-actions">
+                    <button id="openLoginBtn" class="btn-outline"><i class="fas fa-sign-in-alt"></i> Ingia</button>
+                </div>
             </div>
-            <button id="navLoginBtn" class="btn-outline"><i class="fas fa-sign-in-alt"></i> Ingia</button>
-        </div>
-
-        <div class="hero">
-            <h1>Kutana na Wasanii Wako<br>Kwenye Maonyesho ya Moja kwa Moja</h1>
-            <p>Jiunge na jukwaa la kusaidia vipaji vya Tanzania. Shiriki maonyesho, toa maoni, na uwe karibu na wasanii unaowapenda.</p>
-            <button id="heroSignupBtn" class="btn-primary">Anza Sasa <i class="fas fa-arrow-right"></i></button>
-        </div>
-
-        <div class="footer-gallery">
-            <div class="gallery-title">Nyakati za kusisimua kwenye Live</div>
-            <div class="gallery-grid">
-                <img src="1.jpg" alt="Event 1">
-                <img src="2.jpg" alt="Event 2">
-                <img src="3.jpg" alt="Event 3">
+            
+            <!-- Hero Section -->
+            <div class="hero">
+                <h1>Kutana na Wasanii Wako<br>Kwenye Maonyesho ya Moja kwa Moja</h1>
+                <p>Jiunge na jukwaa la kusaidia vipaji vya Tanzania. Shiriki maonyesho, toa maoni, na uwe karibu na wasanii unaowapenda.</p>
+                <button id="openSignupBtn" class="btn-primary">Anza Sasa <i class="fas fa-arrow-right"></i></button>
+            </div>
+            
+            <!-- Footer Gallery -->
+            <div class="footer-gallery">
+                <div class="gallery-title">Nyakati za kusisimua kwenye Live</div>
+                <div class="gallery-grid">
+                    <img src="1.jpg" alt="Event 1">
+                    <img src="2.jpg" alt="Event 2">
+                    <img src="3.jpg" alt="Event 3">
+                </div>
             </div>
         </div>
     </div>
-
-    <!-- Modal -->
+    
+    <!-- MODAL LOGIN FORM -->
     <div id="authModal" class="modal">
         <div class="modal-card">
-            <span class="close-modal" id="closeModalBtn">&times;</span>
-            <h2>Ingia au Jiunge</h2>
-            <button id="googleSignInBtn" class="social-btn google-btn"><i class="fab fa-google"></i> Endelea na Google</button>
-            <button id="phoneSignInBtn" class="social-btn phone-btn"><i class="fas fa-phone-alt"></i> Tumia Namba ya Simu</button>
-            
-            <div id="phoneInputDiv" style="display:none; margin-top:15px;">
-                <input type="tel" id="phoneNumber" placeholder="+255XXXXXXXXX">
-                <button id="sendOtpBtn" class="btn-primary" style="width:100%; margin-top:8px;">Tuma OTP</button>
-                <input type="text" id="otpCode" placeholder="Weka OTP" style="margin-top:10px;">
-                <button id="verifyOtpBtn" class="btn-primary" style="width:100%; margin-top:8px;">Thibitisha</button>
+            <div class="modal-header">
+                <h2 id="modalTitle">Karibu</h2>
+                <span class="close-modal" id="closeModalBtn">&times;</span>
             </div>
-            
-            <div class="email-toggle" id="showEmailForm">👉 Tumia barua pepe</div>
-            
-            <div id="emailForm" class="email-form">
-                <input type="email" id="modalEmail" placeholder="Barua pepe">
-                <input type="password" id="modalPassword" placeholder="Nenosiri">
-                <button id="emailActionBtn" class="btn-primary">Ingia</button>
-                <div class="email-toggle" id="toggleAuthMode">Bado huna akaunti? Jiandikishe</div>
+            <div class="modal-body">
+                <!-- Auth Tabs -->
+                <div class="auth-tabs">
+                    <button class="auth-tab active" id="tabLoginBtn" onclick="switchToLogin()">Ingia</button>
+                    <button class="auth-tab" id="tabRegisterBtn" onclick="switchToRegister()">Jisajili</button>
+                </div>
+                
+                <!-- LOGIN FORM -->
+                <div id="loginFormContent">
+                    <div id="loginError" class="error-msg" style="display: none;">
+                        <i class="fas fa-exclamation-circle"></i> <span></span>
+                    </div>
+                    
+                    <div class="input-group">
+                        <div class="input-icon"><i class="fas fa-envelope"></i></div>
+                        <input type="email" id="loginEmail" placeholder="Barua pepe">
+                    </div>
+                    
+                    <div class="input-group">
+                        <div class="input-icon"><i class="fas fa-lock"></i></div>
+                        <input type="password" id="loginPassword" placeholder="Nenosiri">
+                    </div>
+                    
+                    <div class="forgot-link">
+                        <a href="#" onclick="forgotPassword(); return false;">Umesahau nenosiri?</a>
+                    </div>
+                    
+                    <button class="btn-login" onclick="loginUser()">
+                        Ingia <i class="fas fa-arrow-right"></i>
+                    </button>
+                    
+                    <div class="divider"><span>au</span></div>
+                    
+                    <button class="btn-google" onclick="googleSignIn()">
+                        <i class="fab fa-google"></i> Ingia kwa Google
+                    </button>
+                    
+                    <button class="btn-phone" onclick="showPhoneAuth()">
+                        <i class="fas fa-phone-alt"></i> Ingia kwa Namba ya Simu
+                    </button>
+                    
+                    <div id="otpSection" class="otp-section">
+                        <div class="input-group">
+                            <div class="input-icon"><i class="fas fa-phone"></i></div>
+                            <input type="tel" id="phoneNumber" placeholder="+255XXXXXXXXX">
+                        </div>
+                        <button class="btn-login" onclick="sendOTP()" style="margin-top: 0;">Tuma OTP</button>
+                        <div class="otp-input-group">
+                            <input type="text" id="otpCode" placeholder="OTP" maxlength="6">
+                            <button class="small-btn" onclick="verifyOTP()">Thibitisha</button>
+                        </div>
+                        <div id="otpMessage" style="font-size: 12px; text-align: center; margin-top: 10px;"></div>
+                    </div>
+                </div>
+                
+                <!-- REGISTER FORM -->
+                <div id="registerFormContent" style="display: none;">
+                    <div id="registerError" class="error-msg" style="display: none;">
+                        <i class="fas fa-exclamation-circle"></i> <span></span>
+                    </div>
+                    <div id="registerSuccess" class="success-msg" style="display: none;">
+                        <i class="fas fa-check-circle"></i> <span></span>
+                    </div>
+                    
+                    <div class="input-group">
+                        <div class="input-icon"><i class="fas fa-user"></i></div>
+                        <input type="text" id="regFullName" placeholder="Jina kamili">
+                    </div>
+                    
+                    <div class="input-group">
+                        <div class="input-icon"><i class="fas fa-envelope"></i></div>
+                        <input type="email" id="regEmail" placeholder="Barua pepe">
+                    </div>
+                    
+                    <div class="input-group">
+                        <div class="input-icon"><i class="fas fa-lock"></i></div>
+                        <input type="password" id="regPassword" placeholder="Nenosiri (herufi 6+)" minlength="6">
+                    </div>
+                    
+                    <div class="input-group">
+                        <div class="input-icon"><i class="fas fa-phone"></i></div>
+                        <input type="tel" id="regPhone" placeholder="Namba ya simu (si lazima)">
+                    </div>
+                    
+                    <button class="btn-login" onclick="registerUser()">
+                        Jisajili <i class="fas fa-user-plus"></i>
+                    </button>
+                    
+                    <div class="divider"><span>au</span></div>
+                    
+                    <button class="btn-google" onclick="googleSignIn()">
+                        <i class="fab fa-google"></i> Jisajili kwa Google
+                    </button>
+                </div>
             </div>
-            
-            <div id="modalMsg" class="message"></div>
         </div>
     </div>
-
-    <!-- App Section -->
-    <div id="appSection" style="display:none;">
+    
+    <!-- DASHBOARD SECTION (After login) -->
+    <div id="dashboardSection">
         <div class="container">
-            <div class="welcome-card">
-                <div><i class="fas fa-user-circle"></i> Karibu, <strong id="userNameDisplay"></strong></div>
-                <button id="logoutBtnApp" class="btn-outline" style="background:#dc3545; border:none;">Toka</button>
+            <div class="dashboard-header">
+                <div class="dashboard-logo">
+                    <i class="fas fa-video"></i>
+                    <h2>Joowzey Livestream</h2>
+                </div>
+                <div class="user-area">
+                    <div class="user-info">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userName"></span>
+                    </div>
+                    <button class="logout-btn" onclick="logoutUser()">
+                        <i class="fas fa-sign-out-alt"></i> Toka
+                    </button>
+                </div>
             </div>
-            <h3>Nyimbo na Vipande vya Maonyesho</h3>
+            
+            <h3 style="color: white; margin-bottom: 15px;">🎵 Wasanii na Nyimbo - Piga Kura</h3>
             <div id="clipsContainer" class="clips-grid">Loading clips...</div>
-            <div id="adminDashboard" style="display:none;" class="admin-panel">
-                <h4>Dawati la Admin</h4>
-                <p>Jumla ya watumiaji: <span id="totalUsers">0</span></p>
-                <p>Jumla ya kura zote: <span id="totalVotesAll">0</span></p>
-                <button id="pickWinnerBtn" class="btn-primary">Chagua Mshindi wa Spotlight</button>
-                <div id="winnerResult"></div>
+            
+            <div id="adminDashboard" style="display: none;" class="admin-panel">
+                <h4>⚙️ Dawati la Admin</h4>
+                <p>Jumla ya watumiaji: <strong id="totalUsers">0</strong></p>
+                <p>Jumla ya kura zote: <strong id="totalVotesAll">0</strong></p>
+                <button id="pickWinnerBtn" class="btn-login" style="width: auto; padding: 10px 20px;">🏆 Chagua Mshindi wa Spotlight</button>
+                <div id="winnerResult" style="margin-top: 15px;"></div>
             </div>
         </div>
     </div>
@@ -145,77 +796,141 @@
             appId: "1:214467755859:web:8208af7207ae13592f2ba6"
         };
         
-        // Initialize Firebase (Compat version)
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
         
-        // DOM Elements
-        const modal = document.getElementById('authModal');
-        const navLoginBtn = document.getElementById('navLoginBtn');
-        const heroSignupBtn = document.getElementById('heroSignupBtn');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const googleBtn = document.getElementById('googleSignInBtn');
-        const phoneBtn = document.getElementById('phoneSignInBtn');
-        const phoneInputDiv = document.getElementById('phoneInputDiv');
-        const sendOtpBtn = document.getElementById('sendOtpBtn');
-        const verifyOtpBtn = document.getElementById('verifyOtpBtn');
-        const phoneNumber = document.getElementById('phoneNumber');
-        const otpCode = document.getElementById('otpCode');
-        const showEmailForm = document.getElementById('showEmailForm');
-        const emailForm = document.getElementById('emailForm');
-        const emailActionBtn = document.getElementById('emailActionBtn');
-        const modalEmail = document.getElementById('modalEmail');
-        const modalPassword = document.getElementById('modalPassword');
-        const toggleAuthMode = document.getElementById('toggleAuthMode');
-        const modalMsg = document.getElementById('modalMsg');
-        const appSection = document.getElementById('appSection');
-        const heroSection = document.querySelector('.hero');
-        const footerGallery = document.querySelector('.footer-gallery');
-        const userNameSpan = document.getElementById('userNameDisplay');
-        const clipsContainer = document.getElementById('clipsContainer');
-        const adminDashboard = document.getElementById('adminDashboard');
-        const totalUsersSpan = document.getElementById('totalUsers');
-        const totalVotesAllSpan = document.getElementById('totalVotesAll');
-        const pickWinnerBtn = document.getElementById('pickWinnerBtn');
-        const winnerResultDiv = document.getElementById('winnerResult');
-        const logoutBtnApp = document.getElementById('logoutBtnApp');
-        
-        let isLoginMode = true;
         let currentUserRole = 'fan';
         let confirmationResult = null;
         
-        function showMsg(msg, isError = true) {
-            modalMsg.style.display = 'block';
-            modalMsg.innerText = msg;
-            modalMsg.className = `message ${isError ? 'error' : 'success'}`;
-            setTimeout(() => {
-                modalMsg.style.display = 'none';
-            }, 4000);
-        }
+        // DOM Elements
+        const homePage = document.getElementById('homePage');
+        const dashboardSection = document.getElementById('dashboardSection');
+        const modal = document.getElementById('authModal');
+        const openLoginBtn = document.getElementById('openLoginBtn');
+        const openSignupBtn = document.getElementById('openSignupBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
         
+        // Modal functions
         function openModal() {
             modal.style.display = 'flex';
         }
         
         function closeModal() {
             modal.style.display = 'none';
-            phoneInputDiv.style.display = 'none';
-            emailForm.style.display = 'none';
-            showEmailForm.style.display = 'block';
-            modalEmail.value = '';
-            modalPassword.value = '';
-            phoneNumber.value = '';
-            otpCode.value = '';
+            document.getElementById('otpSection').style.display = 'none';
         }
         
-        // Event Listeners
-        navLoginBtn.onclick = openModal;
-        heroSignupBtn.onclick = openModal;
+        function switchToLogin() {
+            document.getElementById('loginFormContent').style.display = 'block';
+            document.getElementById('registerFormContent').style.display = 'none';
+            document.getElementById('tabLoginBtn').classList.add('active');
+            document.getElementById('tabRegisterBtn').classList.remove('active');
+            document.getElementById('modalTitle').innerText = 'Karibu';
+        }
+        
+        function switchToRegister() {
+            document.getElementById('loginFormContent').style.display = 'none';
+            document.getElementById('registerFormContent').style.display = 'block';
+            document.getElementById('tabRegisterBtn').classList.add('active');
+            document.getElementById('tabLoginBtn').classList.remove('active');
+            document.getElementById('modalTitle').innerText = 'Jisajili';
+        }
+        
+        openLoginBtn.onclick = () => {
+            switchToLogin();
+            openModal();
+        };
+        
+        openSignupBtn.onclick = () => {
+            switchToRegister();
+            openModal();
+        };
+        
         closeModalBtn.onclick = closeModal;
+        window.onclick = (e) => { if (e.target === modal) closeModal(); };
+        
+        window.switchToLogin = switchToLogin;
+        window.switchToRegister = switchToRegister;
+        
+        function showMsg(element, msg, isError = true) {
+            element.style.display = 'flex';
+            element.querySelector('span').innerText = msg;
+            element.className = isError ? 'error-msg' : 'success-msg';
+            setTimeout(() => element.style.display = 'none', 5000);
+        }
+        
+        // Forgot Password
+        window.forgotPassword = async function() {
+            const email = prompt("Ingiza barua pepe yako:");
+            if (email) {
+                try {
+                    await auth.sendPasswordResetEmail(email);
+                    alert("Kiungo cha kuweka upya nenosiri kimetumwa!");
+                } catch (err) {
+                    alert("Hitilafu: " + err.message);
+                }
+            }
+        };
+        
+        // Login
+        window.loginUser = async function() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            if (!email || !password) {
+                showMsg(errorDiv, "Jaza barua pepe na nenosiri", true);
+                return;
+            }
+            
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                closeModal();
+            } catch (err) {
+                showMsg(errorDiv, err.message, true);
+            }
+        };
+        
+        // Register
+        window.registerUser = async function() {
+            const name = document.getElementById('regFullName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const phone = document.getElementById('regPhone').value;
+            const errorDiv = document.getElementById('registerError');
+            const successDiv = document.getElementById('registerSuccess');
+            
+            if (!name || !email || !password) {
+                showMsg(errorDiv, "Jaza nafasi zote muhimu", true);
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMsg(errorDiv, "Nenosiri iwe na herufi 6 au zaidi", true);
+                return;
+            }
+            
+            try {
+                const cred = await auth.createUserWithEmailAndPassword(email, password);
+                await db.collection('users').doc(cred.user.uid).set({
+                    name: name,
+                    email: email,
+                    phone: phone || '',
+                    role: 'fan',
+                    points: 0,
+                    badges: ['fan'],
+                    createdAt: new Date()
+                });
+                showMsg(successDiv, "Usajili umefanikiwa!", false);
+                setTimeout(() => closeModal(), 1500);
+            } catch (err) {
+                showMsg(errorDiv, err.message, true);
+            }
+        };
         
         // Google Sign In
-        googleBtn.onclick = async () => {
+        window.googleSignIn = async function() {
             const provider = new firebase.auth.GoogleAuthProvider();
             try {
                 const result = await auth.signInWithPopup(provider);
@@ -233,36 +948,43 @@
                 }
                 closeModal();
             } catch (err) {
-                showMsg(err.message, true);
+                alert(err.message);
             }
         };
         
-        // Phone Auth
-        phoneBtn.onclick = () => {
-            phoneInputDiv.style.display = 'block';
+        // Phone OTP
+        window.showPhoneAuth = function() {
+            const otpSection = document.getElementById('otpSection');
+            otpSection.style.display = otpSection.style.display === 'none' ? 'block' : 'none';
         };
         
-        sendOtpBtn.onclick = async () => {
-            const phone = phoneNumber.value;
+        window.sendOTP = async function() {
+            const phone = document.getElementById('phoneNumber').value;
+            const otpMessage = document.getElementById('otpMessage');
+            
             if (!phone) {
-                showMsg("Weka namba ya simu kwa +255...", true);
+                otpMessage.innerHTML = '<span style="color: red;">Weka namba ya simu (+255...)</span>';
                 return;
             }
-            const appVerifier = new firebase.auth.RecaptchaVerifier('sendOtpBtn', { size: 'invisible' });
+            
+            const appVerifier = new firebase.auth.RecaptchaVerifier('sendOTP', { size: 'invisible' });
             try {
                 confirmationResult = await auth.signInWithPhoneNumber(phone, appVerifier);
-                showMsg("OTP imetumwa! Angalia simu yako.", false);
+                otpMessage.innerHTML = '<span style="color: green;">✅ OTP imetumwa kwenye simu yako!</span>';
             } catch (err) {
-                showMsg(err.message, true);
+                otpMessage.innerHTML = `<span style="color: red;">❌ ${err.message}</span>`;
             }
         };
         
-        verifyOtpBtn.onclick = async () => {
-            const code = otpCode.value;
+        window.verifyOTP = async function() {
+            const code = document.getElementById('otpCode').value;
+            const otpMessage = document.getElementById('otpMessage');
+            
             if (!code || !confirmationResult) {
-                showMsg("Weka OTP", true);
+                otpMessage.innerHTML = '<span style="color: red;">Weka OTP</span>';
                 return;
             }
+            
             try {
                 const result = await confirmationResult.confirm(code);
                 const user = result.user;
@@ -279,58 +1001,22 @@
                 }
                 closeModal();
             } catch (err) {
-                showMsg(err.message, true);
-            }
-        };
-        
-        // Email/Password
-        showEmailForm.onclick = () => {
-            emailForm.style.display = 'block';
-            showEmailForm.style.display = 'none';
-        };
-        
-        toggleAuthMode.onclick = () => {
-            isLoginMode = !isLoginMode;
-            emailActionBtn.innerText = isLoginMode ? "Ingia" : "Jiandikishe";
-            toggleAuthMode.innerText = isLoginMode ? "Bado huna akaunti? Jiandikishe" : "Tayari una akaunti? Ingia";
-        };
-        
-        emailActionBtn.onclick = async () => {
-            const email = modalEmail.value;
-            const pwd = modalPassword.value;
-            if (!email || !pwd) {
-                showMsg("Jaza barua pepe na nenosiri", true);
-                return;
-            }
-            try {
-                if (isLoginMode) {
-                    await auth.signInWithEmailAndPassword(email, pwd);
-                } else {
-                    const cred = await auth.createUserWithEmailAndPassword(email, pwd);
-                    await db.collection('users').doc(cred.user.uid).set({
-                        name: email.split('@')[0],
-                        email: email,
-                        role: 'fan',
-                        points: 0,
-                        badges: ['fan'],
-                        createdAt: new Date()
-                    });
-                }
-                closeModal();
-            } catch (err) {
-                showMsg(err.message, true);
+                otpMessage.innerHTML = `<span style="color: red;">❌ ${err.message}</span>`;
             }
         };
         
         // Load Clips
         async function loadClips() {
-            clipsContainer.innerHTML = '<div class="clip-card">Loading...</div>';
+            const container = document.getElementById('clipsContainer');
+            container.innerHTML = '<div class="clip-card">Loading...</div>';
+            
             try {
                 const snapshot = await db.collection('clips').get();
                 if (snapshot.empty) {
-                    clipsContainer.innerHTML = '<div class="clip-card">Hakuna clips bado. Admin anaweza kuongeza.</div>';
+                    container.innerHTML = '<div class="clip-card">Hakuna clips bado.</div>';
                     return;
                 }
+                
                 let html = '';
                 snapshot.forEach(doc => {
                     const data = doc.data();
@@ -340,91 +1026,80 @@
                             <div class="clip-title">"${data.songTitle || 'Wimbo'}"</div>
                             <div class="clip-stats">
                                 <span>❤️ <span id="votes-${doc.id}">${data.totalVotes || 0}</span> kura</span>
-                                <button class="vote-btn" data-id="${doc.id}">Piga Kura</button>
+                                <button class="vote-btn" onclick="voteForClip('${doc.id}')">Piga Kura</button>
                             </div>
                         </div>
                     `;
                 });
-                clipsContainer.innerHTML = html;
-                
-                document.querySelectorAll('.vote-btn').forEach(btn => {
-                    btn.onclick = async () => {
-                        const clipId = btn.getAttribute('data-id');
-                        const user = auth.currentUser;
-                        if (!user) return;
-                        const voteRef = db.collection('clips').doc(clipId).collection('votes').doc(user.uid);
-                        const existing = await voteRef.get();
-                        if (existing.exists) {
-                            alert("Umepiga kura tayari kwenye wimbo huu!");
-                            return;
-                        }
-                        await voteRef.set({ votedAt: new Date() });
-                        await db.collection('clips').doc(clipId).update({
-                            totalVotes: firebase.firestore.FieldValue.increment(1)
-                        });
-                        const span = document.getElementById(`votes-${clipId}`);
-                        if (span) span.innerText = parseInt(span.innerText) + 1;
-                        if (currentUserRole === 'admin') loadAdminStats();
-                    };
-                });
+                container.innerHTML = html;
             } catch (err) {
-                console.error(err);
-                clipsContainer.innerHTML = '<div class="clip-card">Error loading clips</div>';
+                container.innerHTML = '<div class="clip-card">Error loading clips</div>';
             }
         }
         
-        // Admin Functions
+        window.voteForClip = async function(clipId) {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            const voteRef = db.collection('clips').doc(clipId).collection('votes').doc(user.uid);
+            const existing = await voteRef.get();
+            
+            if (existing.exists) {
+                alert("Umepiga kura tayari!");
+                return;
+            }
+            
+            await voteRef.set({ votedAt: new Date() });
+            await db.collection('clips').doc(clipId).update({
+                totalVotes: firebase.firestore.FieldValue.increment(1)
+            });
+            
+            const span = document.getElementById(`votes-${clipId}`);
+            if (span) span.innerText = parseInt(span.innerText) + 1;
+            if (currentUserRole === 'admin') loadAdminStats();
+        };
+        
         async function loadAdminStats() {
             if (currentUserRole !== 'admin') return;
-            try {
-                const usersSnap = await db.collection('users').get();
-                totalUsersSpan.innerText = usersSnap.size;
-                const clipsSnap = await db.collection('clips').get();
-                let total = 0;
-                clipsSnap.forEach(doc => total += (doc.data().totalVotes || 0));
-                totalVotesAllSpan.innerText = total;
-            } catch (err) {
-                console.error(err);
-            }
+            const usersSnap = await db.collection('users').get();
+            document.getElementById('totalUsers').innerText = usersSnap.size;
+            const clipsSnap = await db.collection('clips').get();
+            let total = 0;
+            clipsSnap.forEach(doc => total += (doc.data().totalVotes || 0));
+            document.getElementById('totalVotesAll').innerText = total;
         }
         
         async function pickWinner() {
-            try {
-                const spotlight = await db.collection('guestSpotlight').doc('current').get();
-                if (!spotlight.exists) {
-                    winnerResultDiv.innerHTML = '<span class="error">Spotlight haipo</span>';
-                    return;
-                }
-                const participants = spotlight.data().participants || [];
-                if (participants.length === 0) {
-                    winnerResultDiv.innerHTML = '<span class="error">Hakuna washiriki</span>';
-                    return;
-                }
-                const winnerId = participants[Math.floor(Math.random() * participants.length)];
-                const userDoc = await db.collection('users').doc(winnerId).get();
-                const winnerName = userDoc.exists ? userDoc.data().name : winnerId;
-                await db.collection('guestSpotlight').doc('current').update({
-                    winnerId: winnerId,
-                    isDrawn: true,
-                    drawDate: new Date()
-                });
-                winnerResultDiv.innerHTML = `<span class="success">🏆 Mshindi: ${winnerName}</span>`;
-            } catch (err) {
-                winnerResultDiv.innerHTML = `<span class="error">Error: ${err.message}</span>`;
+            const spotlight = await db.collection('guestSpotlight').doc('current').get();
+            if (!spotlight.exists) {
+                document.getElementById('winnerResult').innerHTML = '<span style="color: red;">Spotlight haipo</span>';
+                return;
             }
+            const participants = spotlight.data().participants || [];
+            if (participants.length === 0) {
+                document.getElementById('winnerResult').innerHTML = '<span style="color: red;">Hakuna washiriki</span>';
+                return;
+            }
+            const winnerId = participants[Math.floor(Math.random() * participants.length)];
+            const userDoc = await db.collection('users').doc(winnerId).get();
+            const winnerName = userDoc.exists ? userDoc.data().name : winnerId;
+            await db.collection('guestSpotlight').doc('current').update({ winnerId, isDrawn: true });
+            document.getElementById('winnerResult').innerHTML = `<span style="color: green;">🏆 Mshindi: ${winnerName}</span>`;
         }
+        
+        window.logoutUser = async function() {
+            await auth.signOut();
+        };
         
         // Auth State Listener
         auth.onAuthStateChanged(async (user) => {
-            console.log("Auth state changed:", user ? "Logged in" : "Logged out");
             if (user) {
-                heroSection.style.display = 'none';
-                if (footerGallery) footerGallery.style.display = 'none';
-                appSection.style.display = 'block';
+                homePage.style.display = 'none';
+                dashboardSection.style.display = 'block';
                 
                 const userDoc = await db.collection('users').doc(user.uid).get();
-                let role = 'fan';
                 let name = user.email || user.phoneNumber || "Mtumiaji";
+                let role = 'fan';
                 
                 if (userDoc.exists) {
                     name = userDoc.data().name || name;
@@ -432,27 +1107,19 @@
                 }
                 
                 currentUserRole = role;
-                userNameSpan.innerText = name;
+                document.getElementById('userName').innerText = name;
                 
                 if (role === 'admin') {
-                    adminDashboard.style.display = 'block';
+                    document.getElementById('adminDashboard').style.display = 'block';
                     loadAdminStats();
-                    pickWinnerBtn.onclick = pickWinner;
-                } else {
-                    adminDashboard.style.display = 'none';
+                    document.getElementById('pickWinnerBtn').onclick = pickWinner;
                 }
                 loadClips();
             } else {
-                heroSection.style.display = 'block';
-                if (footerGallery) footerGallery.style.display = 'block';
-                appSection.style.display = 'none';
+                homePage.style.display = 'block';
+                dashboardSection.style.display = 'none';
             }
         });
-        
-        // Logout
-        logoutBtnApp.onclick = () => auth.signOut();
-        
-        console.log("Firebase initialized successfully!");
     </script>
 </body>
 </html>
