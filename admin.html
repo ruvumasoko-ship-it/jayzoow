@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Joowzey Livestream - Admin Panel</title>
+    <title>Joowzey Livestream - Admin Login</title>
     
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
-    <!-- Font Awesome & Charts -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
@@ -25,12 +25,115 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #1a1a2e, #16213e);
             min-height: 100vh;
-            padding: 20px;
         }
         
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Login Page Styles */
+        .login-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 30px;
+            padding: 50px 40px;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+        
+        .login-card h2 {
+            color: #ff9800;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .login-card p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .login-card input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            font-size: 16px;
+            outline: none;
+            transition: 0.2s;
+        }
+        
+        .login-card input:focus {
+            border-color: #ff9800;
+            box-shadow: 0 0 0 3px rgba(255,152,0,0.1);
+        }
+        
+        .login-card button {
+            width: 100%;
+            padding: 15px;
+            background: #ff9800;
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+        
+        .login-card button:hover {
+            background: #f57c00;
+            transform: translateY(-2px);
+        }
+        
+        .google-btn {
+            background: #4285f4 !important;
+            margin-top: 15px !important;
+        }
+        
+        .google-btn:hover {
+            background: #3367d6 !important;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: #999;
+        }
+        
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #ddd;
+        }
+        
+        .divider span {
+            padding: 0 15px;
+        }
+        
+        .error-msg {
+            color: red;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        
+        /* Admin Panel Styles */
+        .admin-content {
+            display: none;
         }
         
         .header {
@@ -77,13 +180,6 @@
             border-radius: 20px;
             padding: 20px;
             text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .stat-card i {
-            font-size: 30px;
-            color: #ff9800;
-            margin-bottom: 10px;
         }
         
         .stat-number {
@@ -92,17 +188,10 @@
             color: #ff9800;
         }
         
-        .stat-label {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
-        }
-        
         .main-card {
             background: rgba(255,255,255,0.95);
             border-radius: 20px;
             padding: 25px;
-            margin-bottom: 25px;
         }
         
         .tabs {
@@ -119,7 +208,6 @@
             cursor: pointer;
             border-radius: 30px;
             transition: 0.2s;
-            font-weight: 500;
         }
         
         .tab:hover {
@@ -139,20 +227,13 @@
             display: block;
             margin-bottom: 5px;
             font-weight: 500;
-            color: #333;
         }
         
-        .input-group input, .input-group textarea {
+        .input-group input {
             width: 100%;
-            padding: 12px 15px;
+            padding: 12px;
             border: 1px solid #ddd;
             border-radius: 10px;
-            font-size: 14px;
-            outline: none;
-        }
-        
-        .input-group input:focus {
-            border-color: #ff9800;
         }
         
         .btn-primary {
@@ -163,27 +244,42 @@
             color: white;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.2s;
         }
         
-        .btn-primary:hover {
-            background: #f57c00;
-            transform: translateY(-2px);
+        .clips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
         }
         
-        .btn-danger {
-            background: #dc2626;
+        .clip-card {
+            background: #f9f9f9;
+            border-radius: 15px;
+            padding: 15px;
+            position: relative;
         }
         
-        .btn-danger:hover {
-            background: #b91c1c;
+        .clip-artist {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff9800;
         }
         
-        .table-container {
-            overflow-x: auto;
-            max-height: 500px;
-            overflow-y: auto;
+        .clip-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
         }
+        
+        .clip-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        
+        .edit-btn { color: #ff9800; }
+        .delete-btn { color: #dc2626; }
         
         table {
             width: 100%;
@@ -198,59 +294,7 @@
         
         th {
             background: #f5f5f5;
-            font-weight: 600;
         }
-        
-        .clips-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-        
-        .clip-card {
-            background: #f9f9f9;
-            border-radius: 15px;
-            padding: 15px;
-            position: relative;
-            transition: 0.2s;
-            border: 1px solid #eee;
-        }
-        
-        .clip-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .clip-artist {
-            font-size: 18px;
-            font-weight: bold;
-            color: #ff9800;
-            margin-bottom: 5px;
-        }
-        
-        .clip-title {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-        
-        .clip-actions {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
-        
-        .clip-actions button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            margin-left: 8px;
-            font-size: 16px;
-            padding: 5px;
-        }
-        
-        .edit-btn { color: #ff9800; }
-        .delete-btn { color: #dc2626; }
         
         .modal {
             display: none;
@@ -273,30 +317,16 @@
             max-width: 500px;
         }
         
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        
         .close-modal {
+            float: right;
             font-size: 24px;
             cursor: pointer;
-            color: #999;
-        }
-        
-        .close-modal:hover {
-            color: #ff9800;
         }
         
         .badge {
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 12px;
-            font-weight: 600;
         }
         
         .badge-admin {
@@ -304,174 +334,127 @@
             color: white;
         }
         
-        .badge-fan {
-            background: #e0e0e0;
-            color: #666;
-        }
-        
-        /* Login form inside admin if not logged in */
-        .login-container {
-            max-width: 450px;
-            margin: 100px auto;
-            background: white;
-            border-radius: 30px;
-            padding: 40px;
-            text-align: center;
-        }
-        
-        .login-container input {
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 30px;
-            font-size: 16px;
-        }
-        
-        .login-container button {
-            width: 100%;
-            padding: 14px;
-            background: #ff9800;
-            border: none;
-            border-radius: 30px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        
-        .error-msg {
-            color: red;
-            margin-top: 10px;
-        }
-        
         @media (max-width: 768px) {
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
-            }
-            .tabs {
-                flex-direction: column;
-            }
-            .tab {
-                text-align: center;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Admin Panel Content (hidden until login) -->
-        <div id="adminContent" style="display: none;">
-            <div class="header">
-                <div class="logo">
-                    <h2>🎬 Joowzey Livestream - Admin Panel</h2>
-                </div>
-                <div class="user-info">
-                    <span><i class="fas fa-user-shield"></i> <span id="adminName">Admin</span></span>
-                    <button class="logout-btn" id="logoutAdminBtn"><i class="fas fa-sign-out-alt"></i> Toka</button>
-                </div>
-            </div>
-            
-            <!-- Stats Cards -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <i class="fas fa-users"></i>
-                    <div class="stat-number" id="totalUsers">0</div>
-                    <div class="stat-label">Watumiaji Jumla</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-video"></i>
-                    <div class="stat-number" id="totalClips">0</div>
-                    <div class="stat-label">Jumla ya Clips</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-heart"></i>
-                    <div class="stat-number" id="totalVotes">0</div>
-                    <div class="stat-label">Jumla ya Kura</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-star"></i>
-                    <div class="stat-number" id="spotlightCount">0</div>
-                    <div class="stat-label">Washiriki Spotlight</div>
-                </div>
-            </div>
-            
-            <!-- Main Card -->
-            <div class="main-card">
-                <div class="tabs">
-                    <div class="tab active" data-tab="clips">🎵 Clips</div>
-                    <div class="tab" data-tab="addClip">➕ Ongeza Clip</div>
-                    <div class="tab" data-tab="users">👥 Watumiaji</div>
-                    <div class="tab" data-tab="spotlight">⭐ Guest Spotlight</div>
-                </div>
-                
-                <div id="tabClips">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <h3>Orodha ya Clips</h3>
-                        <button class="btn-primary" id="goToAddClipBtn">+ Clip Mpya</button>
-                    </div>
-                    <div id="clipsContainer" class="clips-grid">Loading clips...</div>
-                </div>
-                
-                <div id="tabAddClip" style="display: none;">
-                    <h3>Ongeza Clip Mpya</h3>
-                    <div class="input-group">
-                        <label>Jina la Msanii</label>
-                        <input type="text" id="artistName" placeholder="Mwasiti">
-                    </div>
-                    <div class="input-group">
-                        <label>Jina la Wimbo</label>
-                        <input type="text" id="songTitle" placeholder="Nakupenda">
-                    </div>
-                    <div class="input-group">
-                        <label>Muda (sekunde)</label>
-                        <input type="number" id="duration" placeholder="45">
-                    </div>
-                    <button class="btn-primary" id="addClipBtn">Hifadhi Clip</button>
-                </div>
-                
-                <div id="tabUsers" style="display: none;">
-                    <h3>Watumiaji Waliojiandikisha</h3>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr><th>Jina</th><th>Email</th><th>Role</th><th>Tarehe</th><th>Pointi</th></tr>
-                            </thead>
-                            <tbody id="usersTableBody">
-                                <tr><td colspan="5">Loading...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div id="tabSpotlight" style="display: none;">
-                    <h3>Guest Spotlight</h3>
-                    <p><strong>Washiriki waliojiunga:</strong> <span id="spotlightParticipantsCount">0</span></p>
-                    <div id="spotlightList" style="margin: 15px 0; max-height: 200px; overflow-y: auto; background: #f5f5f5; padding: 10px; border-radius: 10px;"></div>
-                    <button class="btn-primary" id="pickWinnerBtn">🏆 Chagua Mshindi</button>
-                    <div id="winnerResult" style="margin-top: 15px; padding: 10px; background: #f0f0f0; border-radius: 10px;"></div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Login Form (shown when not logged in as admin) -->
-        <div id="loginFormContainer" class="login-container">
+    <!-- Login Page -->
+    <div id="loginPage" class="login-page">
+        <div class="login-card">
             <h2>🔐 Admin Login</h2>
-            <p style="color: #666; margin-bottom: 20px;">Ingia kwa akaunti yako ya admin</p>
+            <p>Ingia kwenye Admin Panel ya Joowzey Livestream</p>
+            
             <input type="email" id="adminEmail" placeholder="Barua pepe ya admin">
             <input type="password" id="adminPassword" placeholder="Nenosiri">
-            <button id="adminLoginBtn">Ingia</button>
-            <div id="loginErrorMsg" class="error-msg"></div>
+            <button id="loginBtn">Ingia kwa Email</button>
+            
+            <div class="divider">
+                <span>au</span>
+            </div>
+            
+            <button id="googleLoginBtn" class="google-btn">
+                <i class="fab fa-google"></i> Ingia kwa Google
+            </button>
+            
+            <div id="loginError" class="error-msg"></div>
         </div>
     </div>
     
-    <!-- Edit Clip Modal -->
+    <!-- Admin Panel (hidden until login) -->
+    <div id="adminPanel" class="container" style="display: none;">
+        <div class="header">
+            <div class="logo">
+                <h2>🎬 Joowzey Livestream - Admin Panel</h2>
+            </div>
+            <div class="user-info">
+                <span><i class="fas fa-user-shield"></i> <span id="adminName">Admin</span></span>
+                <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Toka</button>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalUsers">0</div>
+                <div>Watumiaji</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalClips">0</div>
+                <div>Clips</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalVotes">0</div>
+                <div>Kura</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="spotlightCount">0</div>
+                <div>Spotlight</div>
+            </div>
+        </div>
+        
+        <div class="main-card">
+            <div class="tabs">
+                <div class="tab active" data-tab="clips">🎵 Clips</div>
+                <div class="tab" data-tab="addClip">➕ Ongeza Clip</div>
+                <div class="tab" data-tab="users">👥 Watumiaji</div>
+                <div class="tab" data-tab="spotlight">⭐ Spotlight</div>
+            </div>
+            
+            <div id="tabClips">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <h3>Orodha ya Clips</h3>
+                    <button class="btn-primary" id="goToAddClipBtn">+ Clip Mpya</button>
+                </div>
+                <div id="clipsContainer" class="clips-grid">Loading...</div>
+            </div>
+            
+            <div id="tabAddClip" style="display: none;">
+                <h3>Ongeza Clip Mpya</h3>
+                <div class="input-group">
+                    <label>Jina la Msanii</label>
+                    <input type="text" id="artistName" placeholder="Mwasiti">
+                </div>
+                <div class="input-group">
+                    <label>Jina la Wimbo</label>
+                    <input type="text" id="songTitle" placeholder="Nakupenda">
+                </div>
+                <div class="input-group">
+                    <label>Muda (sekunde)</label>
+                    <input type="number" id="duration" placeholder="45">
+                </div>
+                <button class="btn-primary" id="addClipBtn">Hifadhi Clip</button>
+            </div>
+            
+            <div id="tabUsers" style="display: none;">
+                <h3>Watumiaji Waliojiandikisha</h3>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr><th>Jina</th><th>Email</th><th>Role</th><th>Tarehe</th></tr>
+                        </thead>
+                        <tbody id="usersTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="tabSpotlight" style="display: none;">
+                <h3>Guest Spotlight</h3>
+                <p>Washiriki: <span id="spotlightParticipantsCount">0</span></p>
+                <div id="spotlightList" style="margin: 15px 0; max-height: 200px; overflow-y: auto; background: #f5f5f5; padding: 10px; border-radius: 10px;"></div>
+                <button class="btn-primary" id="pickWinnerBtn">🏆 Chagua Mshindi</button>
+                <div id="winnerResult" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Modal -->
     <div id="editModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3>Hariri Clip</h3>
-                <span class="close-modal" id="closeEditModal">&times;</span>
-            </div>
+            <span class="close-modal" id="closeModalBtn">&times;</span>
+            <h3>Hariri Clip</h3>
             <input type="hidden" id="editClipId">
             <div class="input-group">
                 <label>Jina la Msanii</label>
@@ -485,13 +468,12 @@
                 <label>Muda (sekunde)</label>
                 <input type="number" id="editDuration">
             </div>
-            <button class="btn-primary" id="updateClipBtn">Hifadhi Mabadiliko</button>
-            <button class="btn-primary btn-danger" id="deleteClipBtn" style="margin-top: 10px;">Futa Clip</button>
+            <button class="btn-primary" id="updateClipBtn">Hifadhi</button>
+            <button class="btn-primary" id="deleteClipBtn" style="background:#dc2626; margin-top:10px;">Futa Clip</button>
         </div>
     </div>
 
     <script>
-        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBRDOjngQ2aMKmyO-hltQmpXkcsmzYH4xE",
             authDomain: "joowzeylivesteam.firebaseapp.com",
@@ -501,374 +483,70 @@
             appId: "1:214467755859:web:8208af7207ae13592f2ba6"
         };
         
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
         
-        // ============ EMAIL YA ADMIN (BADILISHA HAPA) ============
-        // Weka email yako hapa chini - huyu ndiye pekee atakayeruhusiwa
-        const ADMIN_EMAIL = "joowzey@gmail.com";  // 🔴 BADILISHA HAPA na email yako mwenyewe
+        // ============ ADMIN EMAIL (Badilisha hapa) ============
+        const ADMIN_EMAIL = "joowzey@gmail.com";  // 🔴 Weka email yako mwenyewe
         
-        // ============ GLOBAL VARIABLES ============
-        let currentUser = null;
         let currentEditClipId = null;
         
-        // ============ SWITCH TABS ============
-        function switchTab(tabName) {
-            document.getElementById('tabClips').style.display = 'none';
-            document.getElementById('tabAddClip').style.display = 'none';
-            document.getElementById('tabUsers').style.display = 'none';
-            document.getElementById('tabSpotlight').style.display = 'none';
+        // ============ LOGIN FUNCTIONS ============
+        async function handleAdminLogin(user) {
+            if (!user) return false;
             
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            if (tabName === 'clips') {
-                document.getElementById('tabClips').style.display = 'block';
-                document.querySelector('.tab[data-tab="clips"]').classList.add('active');
-                loadClips();
-            } else if (tabName === 'addClip') {
-                document.getElementById('tabAddClip').style.display = 'block';
-                document.querySelector('.tab[data-tab="addClip"]').classList.add('active');
-            } else if (tabName === 'users') {
-                document.getElementById('tabUsers').style.display = 'block';
-                document.querySelector('.tab[data-tab="users"]').classList.add('active');
-                loadUsers();
-            } else if (tabName === 'spotlight') {
-                document.getElementById('tabSpotlight').style.display = 'block';
-                document.querySelector('.tab[data-tab="spotlight"]').classList.add('active');
-                loadSpotlight();
+            // Check if email matches admin email
+            if (user.email !== ADMIN_EMAIL) {
+                await auth.signOut();
+                document.getElementById('loginError').innerText = "Akaunti hii sio ya admin. Wasiliana na mwenye mfumo.";
+                return false;
             }
-        }
-        
-        // ============ LOAD STATS ============
-        async function loadStats() {
-            try {
-                const usersSnapshot = await db.collection('users').get();
-                const clipsSnapshot = await db.collection('clips').get();
-                const spotlightDoc = await db.collection('guestSpotlight').doc('current').get();
-                
-                let totalVotes = 0;
-                clipsSnapshot.forEach(doc => {
-                    totalVotes += (doc.data().totalVotes || 0);
+            
+            // Ensure user has admin role in Firestore
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            if (!userDoc.exists) {
+                await db.collection('users').doc(user.uid).set({
+                    name: "Admin",
+                    email: user.email,
+                    role: "admin",
+                    points: 0,
+                    badges: ["admin"],
+                    createdAt: new Date()
                 });
-                
-                document.getElementById('totalUsers').innerText = usersSnapshot.size;
-                document.getElementById('totalClips').innerText = clipsSnapshot.size;
-                document.getElementById('totalVotes').innerText = totalVotes;
-                document.getElementById('spotlightCount').innerText = spotlightDoc.exists ? (spotlightDoc.data().participants || []).length : 0;
-            } catch (error) {
-                console.error("Error loading stats:", error);
-            }
-        }
-        
-        // ============ LOAD CLIPS ============
-        async function loadClips() {
-            const container = document.getElementById('clipsContainer');
-            container.innerHTML = '<div class="clip-card">Loading clips...</div>';
-            
-            try {
-                const snapshot = await db.collection('clips').get();
-                if (snapshot.empty) {
-                    container.innerHTML = '<div class="clip-card">Hakuna clips. Ongeza clip mpya.</div>';
-                    return;
-                }
-                
-                let html = '';
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    html += `
-                        <div class="clip-card">
-                            <div class="clip-actions">
-                                <button class="edit-btn" onclick="openEditModal('${doc.id}')"><i class="fas fa-edit"></i></button>
-                                <button class="delete-btn" onclick="deleteClip('${doc.id}')"><i class="fas fa-trash"></i></button>
-                            </div>
-                            <div class="clip-artist">🎤 ${escapeHtml(data.artistName) || 'Msanii'}</div>
-                            <div class="clip-title">${escapeHtml(data.songTitle) || 'Wimbo'}</div>
-                            <div><small>❤️ ${data.totalVotes || 0} kura | ⏱️ ${data.duration || 0} sec</small></div>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
-            } catch (error) {
-                console.error("Error loading clips:", error);
-                container.innerHTML = '<div class="clip-card">Error loading clips</div>';
-            }
-        }
-        
-        // ============ ADD CLIP ============
-        async function addClip() {
-            const artistName = document.getElementById('artistName').value.trim();
-            const songTitle = document.getElementById('songTitle').value.trim();
-            const duration = parseInt(document.getElementById('duration').value) || 0;
-            
-            if (!artistName || !songTitle) {
-                alert("Tafadhali jaza jina la msanii na wimbo!");
-                return;
+            } else if (userDoc.data().role !== 'admin') {
+                await db.collection('users').doc(user.uid).update({ role: "admin" });
             }
             
-            try {
-                await db.collection('clips').add({
-                    artistName: artistName,
-                    songTitle: songTitle,
-                    duration: duration,
-                    totalVotes: 0,
-                    liveDate: new Date()
-                });
-                
-                alert("Clip imeongezwa kikamilifu!");
-                document.getElementById('artistName').value = '';
-                document.getElementById('songTitle').value = '';
-                document.getElementById('duration').value = '';
-                
-                loadClips();
-                loadStats();
-                switchTab('clips');
-            } catch (error) {
-                console.error("Error adding clip:", error);
-                alert("Hitilafu: " + error.message);
-            }
-        }
-        
-        // ============ EDIT CLIP ============
-        window.openEditModal = async function(clipId) {
-            currentEditClipId = clipId;
-            try {
-                const doc = await db.collection('clips').doc(clipId).get();
-                const data = doc.data();
-                document.getElementById('editArtistName').value = data.artistName || '';
-                document.getElementById('editSongTitle').value = data.songTitle || '';
-                document.getElementById('editDuration').value = data.duration || 0;
-                document.getElementById('editModal').style.display = 'flex';
-            } catch (error) {
-                console.error("Error loading clip:", error);
-            }
-        };
-        
-        async function updateClip() {
-            if (!currentEditClipId) return;
+            // Show admin panel
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('adminName').innerText = user.email.split('@')[0];
             
-            const updatedData = {
-                artistName: document.getElementById('editArtistName').value.trim(),
-                songTitle: document.getElementById('editSongTitle').value.trim(),
-                duration: parseInt(document.getElementById('editDuration').value) || 0
-            };
+            // Load all data
+            await loadStats();
+            await loadClips();
+            await loadUsers();
+            await loadSpotlight();
             
-            if (!updatedData.artistName || !updatedData.songTitle) {
-                alert("Jaza jina la msanii na wimbo!");
-                return;
-            }
-            
-            try {
-                await db.collection('clips').doc(currentEditClipId).update(updatedData);
-                alert("Clip imeharririwa!");
-                closeEditModal();
-                loadClips();
-            } catch (error) {
-                console.error("Error updating clip:", error);
-                alert("Hitilafu: " + error.message);
-            }
+            return true;
         }
         
-        window.deleteClip = async function(clipId) {
-            if (confirm("Una uhakika unataka kufuta clip hii?")) {
-                try {
-                    await db.collection('clips').doc(clipId).delete();
-                    alert("Clip imefutwa!");
-                    loadClips();
-                    loadStats();
-                } catch (error) {
-                    console.error("Error deleting clip:", error);
-                    alert("Hitilafu: " + error.message);
-                }
-            }
-        };
-        
-        async function deleteCurrentClip() {
-            if (currentEditClipId && confirm("Una uhakika unataka kufuta clip hii?")) {
-                try {
-                    await db.collection('clips').doc(currentEditClipId).delete();
-                    alert("Clip imefutwa!");
-                    closeEditModal();
-                    loadClips();
-                    loadStats();
-                } catch (error) {
-                    console.error("Error deleting clip:", error);
-                    alert("Hitilafu: " + error.message);
-                }
-            }
-        }
-        
-        function closeEditModal() {
-            document.getElementById('editModal').style.display = 'none';
-            currentEditClipId = null;
-        }
-        
-        // ============ LOAD USERS ============
-        async function loadUsers() {
-            const tbody = document.getElementById('usersTableBody');
-            tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
-            
-            try {
-                const snapshot = await db.collection('users').get();
-                if (snapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="5">Hakuna watumiaji</td></tr>';
-                    return;
-                }
-                
-                let html = '';
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const roleClass = data.role === 'admin' ? 'badge-admin' : 'badge-fan';
-                    const createdAt = data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString() : '-';
-                    html += `
-                        <tr>
-                            <td>${escapeHtml(data.name) || '-'}</td>
-                            <td>${escapeHtml(data.email) || '-'}</td>
-                            <td><span class="badge ${roleClass}">${data.role || 'fan'}</span></td>
-                            <td>${createdAt}</td>
-                            <td>${data.points || 0}</td>
-                        </tr>
-                    `;
-                });
-                tbody.innerHTML = html;
-            } catch (error) {
-                console.error("Error loading users:", error);
-                tbody.innerHTML = '<tr><td colspan="5">Error loading users</td></tr>';
-            }
-        }
-        
-        // ============ LOAD SPOTLIGHT ============
-        async function loadSpotlight() {
-            try {
-                const spotlightDoc = await db.collection('guestSpotlight').doc('current').get();
-                const participants = spotlightDoc.exists ? (spotlightDoc.data().participants || []) : [];
-                document.getElementById('spotlightParticipantsCount').innerText = participants.length;
-                
-                if (participants.length === 0) {
-                    document.getElementById('spotlightList').innerHTML = '<div>Hakuna washiriki bado</div>';
-                    return;
-                }
-                
-                let html = '';
-                for (const userId of participants) {
-                    try {
-                        const userDoc = await db.collection('users').doc(userId).get();
-                        const userName = userDoc.exists ? userDoc.data().name : userId;
-                        html += `<div style="padding: 8px; border-bottom: 1px solid #ddd;">👤 ${escapeHtml(userName)}</div>`;
-                    } catch (err) {
-                        html += `<div style="padding: 8px;">👤 ${userId}</div>`;
-                    }
-                }
-                document.getElementById('spotlightList').innerHTML = html;
-            } catch (error) {
-                console.error("Error loading spotlight:", error);
-            }
-        }
-        
-        // ============ PICK SPOTLIGHT WINNER ============
-        async function pickSpotlightWinner() {
-            try {
-                const spotlightDoc = await db.collection('guestSpotlight').doc('current').get();
-                const participants = spotlightDoc.exists ? (spotlightDoc.data().participants || []) : [];
-                
-                if (participants.length === 0) {
-                    document.getElementById('winnerResult').innerHTML = '<span style="color: red;">❌ Hakuna washiriki katika spotlight!</span>';
-                    return;
-                }
-                
-                const winnerId = participants[Math.floor(Math.random() * participants.length)];
-                const userDoc = await db.collection('users').doc(winnerId).get();
-                const winnerName = userDoc.exists ? userDoc.data().name : winnerId;
-                
-                await db.collection('guestSpotlight').doc('current').update({
-                    winnerId: winnerId,
-                    isDrawn: true,
-                    drawDate: new Date()
-                });
-                
-                document.getElementById('winnerResult').innerHTML = `<span style="color: green; font-size: 16px;">🏆 Mshindi: ${escapeHtml(winnerName)} 🎉</span>`;
-                loadStats();
-            } catch (error) {
-                console.error("Error picking winner:", error);
-                document.getElementById('winnerResult').innerHTML = '<span style="color: red;">Hitilafu: ' + error.message + '</span>';
-            }
-        }
-        
-        // ============ HELPER FUNCTIONS ============
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        function showAdminContent() {
-            document.getElementById('adminContent').style.display = 'block';
-            document.getElementById('loginFormContainer').style.display = 'none';
-        }
-        
-        function showLoginForm() {
-            document.getElementById('adminContent').style.display = 'none';
-            document.getElementById('loginFormContainer').style.display = 'block';
-        }
-        
-        // ============ ADMIN LOGIN ============
-        async function loginAsAdmin() {
+        // Email/Password Login
+        async function loginWithEmail() {
             const email = document.getElementById('adminEmail').value.trim();
             const password = document.getElementById('adminPassword').value;
-            const errorDiv = document.getElementById('loginErrorMsg');
+            const errorDiv = document.getElementById('loginError');
             
             if (!email || !password) {
                 errorDiv.innerText = "Tafadhali jaza barua pepe na nenosiri";
                 return;
             }
             
-            // Check if email matches the predefined admin email
-            if (email !== ADMIN_EMAIL) {
-                errorDiv.innerText = "Barua pepe hii si ya admin. Wasiliana na mwenye mfumo.";
-                return;
-            }
-            
             try {
-                // Try to sign in
                 const userCred = await auth.signInWithEmailAndPassword(email, password);
-                const user = userCred.user;
-                
-                // Check or create admin document in Firestore
-                const userDoc = await db.collection('users').doc(user.uid).get();
-                if (!userDoc.exists) {
-                    await db.collection('users').doc(user.uid).set({
-                        name: "Admin",
-                        email: email,
-                        role: "admin",
-                        points: 0,
-                        badges: ["admin"],
-                        createdAt: new Date()
-                    });
-                } else {
-                    // Ensure role is admin
-                    if (userDoc.data().role !== 'admin') {
-                        await db.collection('users').doc(user.uid).update({
-                            role: "admin"
-                        });
-                    }
-                }
-                
-                errorDiv.innerText = "";
-                showAdminContent();
-                document.getElementById('adminName').innerText = "Admin";
-                
-                // Load all data
-                await loadStats();
-                await loadClips();
-                await loadUsers();
-                await loadSpotlight();
-                
+                await handleAdminLogin(userCred.user);
             } catch (error) {
-                console.error("Login error:", error);
                 if (error.code === 'auth/user-not-found') {
                     errorDiv.innerText = "Akaunti haipo. Hakikisha umesajiliwa kwenye mfumo.";
                 } else if (error.code === 'auth/wrong-password') {
@@ -879,78 +557,246 @@
             }
         }
         
-        // ============ LOGOUT ============
-        async function logoutAdmin() {
-            await auth.signOut();
-            showLoginForm();
-            document.getElementById('adminEmail').value = '';
-            document.getElementById('adminPassword').value = '';
+        // Google Login
+        async function loginWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            const errorDiv = document.getElementById('loginError');
+            
+            try {
+                const result = await auth.signInWithPopup(provider);
+                const user = result.user;
+                
+                if (user.email !== ADMIN_EMAIL) {
+                    await auth.signOut();
+                    errorDiv.innerText = "Akaunti hii sio ya admin. Tafadhali ingia kwa akaunti ya admin.";
+                    return;
+                }
+                
+                await handleAdminLogin(user);
+            } catch (error) {
+                errorDiv.innerText = "Hitilafu: " + error.message;
+            }
         }
         
-        // ============ CHECK AUTH STATE ============
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                // Check if this user is the admin by email
-                if (user.email === ADMIN_EMAIL) {
-                    // Ensure role is admin in Firestore
-                    const userDoc = await db.collection('users').doc(user.uid).get();
-                    if (!userDoc.exists || userDoc.data().role !== 'admin') {
-                        await db.collection('users').doc(user.uid).set({
-                            name: "Admin",
-                            email: user.email,
-                            role: "admin",
-                            points: 0,
-                            badges: ["admin"],
-                            createdAt: new Date()
-                        }, { merge: true });
-                    }
-                    showAdminContent();
-                    document.getElementById('adminName').innerText = "Admin";
-                    await loadStats();
-                    await loadClips();
-                    await loadUsers();
-                    await loadSpotlight();
-                } else {
-                    // Not the right admin email, sign out
-                    await auth.signOut();
-                    showLoginForm();
-                    document.getElementById('loginErrorMsg').innerText = "Akaunti hii haina ruhusa ya kuingia admin panel.";
-                }
-            } else {
-                showLoginForm();
+        // Logout
+        async function logoutAdmin() {
+            await auth.signOut();
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('adminEmail').value = '';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('loginError').innerText = '';
+        }
+        
+        // ============ LOAD DATA FUNCTIONS ============
+        async function loadStats() {
+            const users = await db.collection('users').get();
+            const clips = await db.collection('clips').get();
+            const spotlight = await db.collection('guestSpotlight').doc('current').get();
+            let totalVotes = 0;
+            clips.forEach(doc => totalVotes += (doc.data().totalVotes || 0));
+            
+            document.getElementById('totalUsers').innerText = users.size;
+            document.getElementById('totalClips').innerText = clips.size;
+            document.getElementById('totalVotes').innerText = totalVotes;
+            document.getElementById('spotlightCount').innerText = spotlight.exists ? (spotlight.data().participants || []).length : 0;
+        }
+        
+        async function loadClips() {
+            const container = document.getElementById('clipsContainer');
+            const snapshot = await db.collection('clips').get();
+            if (snapshot.empty) {
+                container.innerHTML = '<div class="clip-card">Hakuna clips. Ongeza clip mpya.</div>';
+                return;
             }
-        });
+            
+            let html = '';
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                html += `
+                    <div class="clip-card">
+                        <div class="clip-actions">
+                            <button class="edit-btn" onclick="openEditModal('${doc.id}')"><i class="fas fa-edit"></i></button>
+                            <button class="delete-btn" onclick="deleteClip('${doc.id}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                        <div class="clip-artist">🎤 ${data.artistName || 'Msanii'}</div>
+                        <div>${data.songTitle || 'Wimbo'}</div>
+                        <div><small>❤️ ${data.totalVotes || 0} kura</small></div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+        
+        async function addClip() {
+            const artist = document.getElementById('artistName').value.trim();
+            const song = document.getElementById('songTitle').value.trim();
+            const duration = parseInt(document.getElementById('duration').value) || 0;
+            
+            if (!artist || !song) {
+                alert("Jaza jina la msanii na wimbo!");
+                return;
+            }
+            
+            await db.collection('clips').add({
+                artistName: artist,
+                songTitle: song,
+                duration: duration,
+                totalVotes: 0,
+                liveDate: new Date()
+            });
+            
+            alert("Clip imeongezwa!");
+            document.getElementById('artistName').value = '';
+            document.getElementById('songTitle').value = '';
+            document.getElementById('duration').value = '';
+            loadClips();
+            loadStats();
+            switchTab('clips');
+        }
+        
+        async function loadUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            const snapshot = await db.collection('users').get();
+            if (snapshot.empty) {
+                tbody.innerHTML = '<tr><td colspan="4">Hakuna watumiaji</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const createdAt = data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString() : '-';
+                html += `
+                    <tr>
+                        <td>${data.name || '-'}</td>
+                        <td>${data.email || '-'}</td>
+                        <td><span class="badge badge-admin">${data.role || 'fan'}</span></td>
+                        <td>${createdAt}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+        
+        async function loadSpotlight() {
+            const spotlight = await db.collection('guestSpotlight').doc('current').get();
+            const participants = spotlight.exists ? (spotlight.data().participants || []) : [];
+            document.getElementById('spotlightParticipantsCount').innerText = participants.length;
+            
+            if (participants.length === 0) {
+                document.getElementById('spotlightList').innerHTML = '<div>Hakuna washiriki</div>';
+                return;
+            }
+            
+            let html = '';
+            for (const uid of participants) {
+                const user = await db.collection('users').doc(uid).get();
+                html += `<div>👤 ${user.exists ? user.data().name : uid}</div>`;
+            }
+            document.getElementById('spotlightList').innerHTML = html;
+        }
+        
+        async function pickWinner() {
+            const spotlight = await db.collection('guestSpotlight').doc('current').get();
+            const participants = spotlight.exists ? (spotlight.data().participants || []) : [];
+            if (participants.length === 0) {
+                document.getElementById('winnerResult').innerHTML = '<span style="color:red;">Hakuna washiriki</span>';
+                return;
+            }
+            const winnerId = participants[Math.floor(Math.random() * participants.length)];
+            const userDoc = await db.collection('users').doc(winnerId).get();
+            const winnerName = userDoc.exists ? userDoc.data().name : winnerId;
+            await db.collection('guestSpotlight').doc('current').update({ winnerId, isDrawn: true });
+            document.getElementById('winnerResult').innerHTML = `<span style="color:green;">🏆 Mshindi: ${winnerName}</span>`;
+        }
+        
+        window.deleteClip = async (clipId) => {
+            if (confirm("Futa clip hii?")) {
+                await db.collection('clips').doc(clipId).delete();
+                loadClips();
+                loadStats();
+            }
+        };
+        
+        window.openEditModal = async (clipId) => {
+            currentEditClipId = clipId;
+            const doc = await db.collection('clips').doc(clipId).get();
+            const data = doc.data();
+            document.getElementById('editArtistName').value = data.artistName || '';
+            document.getElementById('editSongTitle').value = data.songTitle || '';
+            document.getElementById('editDuration').value = data.duration || 0;
+            document.getElementById('editModal').style.display = 'flex';
+        };
+        
+        async function updateClip() {
+            await db.collection('clips').doc(currentEditClipId).update({
+                artistName: document.getElementById('editArtistName').value,
+                songTitle: document.getElementById('editSongTitle').value,
+                duration: parseInt(document.getElementById('editDuration').value) || 0
+            });
+            alert("Clip imeharririwa!");
+            document.getElementById('editModal').style.display = 'none';
+            loadClips();
+        }
+        
+        async function deleteCurrentClip() {
+            if (confirm("Futa clip hii?")) {
+                await db.collection('clips').doc(currentEditClipId).delete();
+                document.getElementById('editModal').style.display = 'none';
+                loadClips();
+                loadStats();
+            }
+        }
+        
+        function switchTab(tabName) {
+            document.getElementById('tabClips').style.display = 'none';
+            document.getElementById('tabAddClip').style.display = 'none';
+            document.getElementById('tabUsers').style.display = 'none';
+            document.getElementById('tabSpotlight').style.display = 'none';
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            if (tabName === 'clips') {
+                document.getElementById('tabClips').style.display = 'block';
+                document.querySelector('.tab[data-tab="clips"]').classList.add('active');
+            } else if (tabName === 'addClip') {
+                document.getElementById('tabAddClip').style.display = 'block';
+                document.querySelector('.tab[data-tab="addClip"]').classList.add('active');
+            } else if (tabName === 'users') {
+                document.getElementById('tabUsers').style.display = 'block';
+                document.querySelector('.tab[data-tab="users"]').classList.add('active');
+            } else if (tabName === 'spotlight') {
+                document.getElementById('tabSpotlight').style.display = 'block';
+                document.querySelector('.tab[data-tab="spotlight"]').classList.add('active');
+            }
+        }
         
         // ============ EVENT LISTENERS ============
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                const tabName = tab.getAttribute('data-tab');
-                switchTab(tabName);
-            });
-        });
-        
-        document.getElementById('logoutAdminBtn').addEventListener('click', logoutAdmin);
-        document.getElementById('goToAddClipBtn').addEventListener('click', () => switchTab('addClip'));
+        document.getElementById('loginBtn').addEventListener('click', loginWithEmail);
+        document.getElementById('googleLoginBtn').addEventListener('click', loginWithGoogle);
+        document.getElementById('logoutBtn').addEventListener('click', logoutAdmin);
         document.getElementById('addClipBtn').addEventListener('click', addClip);
+        document.getElementById('goToAddClipBtn').addEventListener('click', () => switchTab('addClip'));
         document.getElementById('updateClipBtn').addEventListener('click', updateClip);
         document.getElementById('deleteClipBtn').addEventListener('click', deleteCurrentClip);
-        document.getElementById('pickWinnerBtn').addEventListener('click', pickSpotlightWinner);
-        document.getElementById('closeEditModal').addEventListener('click', closeEditModal);
-        document.getElementById('adminLoginBtn').addEventListener('click', loginAsAdmin);
+        document.getElementById('pickWinnerBtn').addEventListener('click', pickWinner);
+        document.getElementById('closeModalBtn').addEventListener('click', () => document.getElementById('editModal').style.display = 'none');
         
-        // Allow Enter key on login form
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => switchTab(tab.getAttribute('data-tab')));
+        });
+        
+        // Enter key on password field
         document.getElementById('adminPassword').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') loginAsAdmin();
+            if (e.key === 'Enter') loginWithEmail();
         });
         
-        // Close modal when clicking outside
-        window.addEventListener('click', (e) => {
-            const modal = document.getElementById('editModal');
-            if (e.target === modal) closeEditModal();
+        // Check if already logged in
+        auth.onAuthStateChanged(async (user) => {
+            if (user && user.email === ADMIN_EMAIL) {
+                await handleAdminLogin(user);
+            }
         });
-        
-        // Start with clips tab when admin content is shown
-        switchTab('clips');
     </script>
 </body>
 </html>
