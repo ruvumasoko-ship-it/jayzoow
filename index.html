@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Joowzey Livestream | Shiriki Maonyesho</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: url('back.jpg') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            color: #fff;
+        }
+        /* Dark overlay for readability */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(3px);
+            z-index: -1;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        /* Navigation */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-img {
+            height: 48px;
+            width: auto;
+        }
+        .brand-name {
+            font-size: 1.7rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #FFFFFF, #FFB347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .nav-actions {
+            display: flex;
+            gap: 16px;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid rgba(255,255,255,0.8);
+            padding: 8px 24px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-outline:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: white;
+        }
+        .btn-primary {
+            background: #ff9800;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 40px;
+            font-weight: 700;
+            color: #1e1e2a;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .btn-primary:hover {
+            background: #f57c00;
+            transform: translateY(-2px);
+        }
+        /* Hero section - no voting words */
+        .hero {
+            text-align: center;
+            padding: 80px 20px 60px;
+        }
+        .hero h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff, #ffb347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 650px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+        }
+        /* Modal - professional */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(12px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-card {
+            background: #1e1e2a;
+            border-radius: 32px;
+            padding: 40px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .modal-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .modal-card input {
+            width: 100%;
+            padding: 14px 16px;
+            margin: 12px 0;
+            border: none;
+            border-radius: 60px;
+            background: #2c2c3a;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+        .modal-card input:focus {
+            box-shadow: 0 0 0 2px #ff9800;
+        }
+        .modal-card button {
+            width: 100%;
+            margin-top: 10px;
+        }
+        .modal-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        .modal-footer span {
+            color: #ff9800;
+            cursor: pointer;
+        }
+        .close-modal {
+            float: right;
+            font-size: 28px;
+            cursor: pointer;
+        }
+        /* App section (after login) */
+        #appSection {
+            display: none;
+        }
+        .welcome-card {
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 20px;
+            margin: 30px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .clips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+        .clip-card {
+            background: rgba(20,20,35,0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 28px;
+            padding: 20px;
+            transition: 0.2s;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .clip-card:hover {
+            transform: translateY(-5px);
+        }
+        .clip-artist {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #ffb347;
+        }
+        .clip-title {
+            font-size: 1rem;
+            margin: 8px 0;
+            color: #ddd;
+        }
+        .clip-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+        .vote-btn {
+            background: #ff5722;
+            border: none;
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+        }
+        .admin-panel {
+            background: rgba(0,0,0,0.7);
+            border-left: 4px solid #ff9800;
+            padding: 20px;
+            border-radius: 20px;
+            margin-top: 40px;
+        }
+        .message {
+            padding: 10px;
+            border-radius: 20px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .error { background: #dc3545cc; }
+        .success { background: #28a745cc; }
+        @media (max-width: 700px) {
+            .hero h1 { font-size: 2.2rem; }
+            .brand-name { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Navigation -->
+    <div class="navbar">
+        <div class="logo-area">
+            <img src="logo.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
+            <span class="brand-name">Joowzey Livestream</span>
+        </div>
+        <div class="nav-actions">
+            <button id="navLoginBtn" class="btn-outline"><i class="fas fa-sign-in-alt"></i> Ingia</button>
+        </div>
+    </div>
+
+    <!-- Hero Section (No voting words) -->
+    <div class="hero">
+        <h1>Kutana na Wasanii Wako <br>Kwenye Maonyesho ya Moja kwa Moja</h1>
+        <p>Jiunge na jukwaa la kusaidia vipaji vya Tanzania. Shiriki maonyesho, toa maoni, na uwe karibu na wasanii unaowapenda.</p>
+        <button id="heroSignupBtn" class="btn-primary">Anza Sasa &nbsp; <i class="fas fa-arrow-right"></i></button>
+    </div>
+
+    <!-- Modal Login/Signup -->
+    <div id="authModal" class="modal">
+        <div class="modal-card">
+            <span class="close-modal" id="closeModalBtn">&times;</span>
+            <h2 id="modalTitle">Ingia</h2>
+            <input type="email" id="modalEmail" placeholder="Barua pepe">
+            <input type="password" id="modalPassword" placeholder="Nenosiri">
+            <button id="modalActionBtn" class="btn-primary">Ingia</button>
+            <div class="modal-footer">
+                <span id="toggleAuthMode">Bado huna akaunti? Jiandikishe</span>
+            </div>
+            <div id="modalMsg" class="message" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- App Section (after login) -->
+    <div id="appSection">
+        <div class="welcome-card">
+            <div><i class="fas fa-user-circle"></i> Karibu, <strong id="userNameDisplay"></strong></div>
+            <button id="logoutBtnApp" class="btn-outline" style="background:#dc3545; border:none;">Toka</button>
+        </div>
+
+        <h3>Nyimbo na Vipande vya Maonyesho</h3>
+        <div id="clipsContainer" class="clips-grid">Loading clips...</div>
+
+        <!-- Admin dashboard (hidden by default) -->
+        <div id="adminDashboard" style="display:none;" class="admin-panel">
+            <h4>Dawati la Admin</h4>
+            <p>Jumla ya watumiaji: <span id="totalUsers">0</span></p>
+            <p>Jumla ya kura zote: <span id="totalVotesAll">0</span></p>
+            <button id="pickWinnerBtn" class="btn-primary">Chagua Mshindi wa Spotlight</button>
+            <div id="winnerResult"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Firebase config
+    const firebaseConfig = {
+        apiKey: "AIzaSyBRDOjngQ2aMKmyO-hltQmpXkcsmzYH4xE",
+        authDomain: "joowzeylivesteam.firebaseapp.com",
+        projectId: "joowzeylivesteam",
+        storageBucket: "joowzeylivesteam.firebasestorage.app",
+        messagingSenderId: "214467755859",
+        appId: "1:214467755859:web:8208af7207ae13592f2ba6"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // DOM elements
+    const modal = document.getElementById('authModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalActionBtn = document.getElementById('modalActionBtn');
+    const toggleAuthMode = document.getElementById('toggleAuthMode');
+    const modalEmail = document.getElementById('modalEmail');
+    const modalPassword = document.getElementById('modalPassword');
+    const modalMsg = document.getElementById('modalMsg');
+    const appSection = document.getElementById('appSection');
+    const heroSection = document.querySelector('.hero');
+    const navLoginBtn = document.getElementById('navLoginBtn');
+    const heroSignupBtn = document.getElementById('heroSignupBtn');
+    const userNameSpan = document.getElementById('userNameDisplay');
+    const clipsContainer = document.getElementById('clipsContainer');
+    const adminDashboard = document.getElementById('adminDashboard');
+    const totalUsersSpan = document.getElementById('totalUsers');
+    const totalVotesAllSpan = document.getElementById('totalVotesAll');
+    const pickWinnerBtn = document.getElementById('pickWinnerBtn');
+    const winnerResultDiv = document.getElementById('winnerResult');
+    const logoutBtnApp = document.getElementById('logoutBtnApp');
+
+    let isLoginMode = true;
+    let currentUserRole = 'fan';
+
+    function showModalMsg(msg, isError = true) {
+        modalMsg.style.display = 'block';
+        modalMsg.innerText = msg;
+        modalMsg.className = `message ${isError ? 'error' : 'success'}`;
+        setTimeout(() => modalMsg.style.display = 'none', 4000);
+    }
+
+    function toggleModal() {
+        if (isLoginMode) {
+            modalTitle.innerText = 'Ingia';
+            modalActionBtn.innerText = 'Ingia';
+            toggleAuthMode.innerText = 'Bado huna akaunti? Jiandikishe';
+        } else {
+            modalTitle.innerText = 'Jiandikishe';
+            modalActionBtn.innerText = 'Jiandikishe';
+            toggleAuthMode.innerText = 'Tayari una akaunti? Ingia';
+        }
+    }
+
+    toggleAuthMode.onclick = () => {
+        isLoginMode = !isLoginMode;
+        toggleModal();
+    };
+
+    function openModal() { modal.style.display = 'flex'; }
+    function closeModal() { modal.style.display = 'none'; }
+    document.getElementById('closeModalBtn').onclick = closeModal;
+    navLoginBtn.onclick = openModal;
+    heroSignupBtn.onclick = () => { isLoginMode = false; toggleModal(); openModal(); };
+
+    modalActionBtn.onclick = async () => {
+        const email = modalEmail.value;
+        const pwd = modalPassword.value;
+        if (!email || !pwd) return showModalMsg("Tafadhali jaza barua pepe na nenosiri", true);
+        try {
+            if (isLoginMode) {
+                await auth.signInWithEmailAndPassword(email, pwd);
+                closeModal();
+            } else {
+                const cred = await auth.createUserWithEmailAndPassword(email, pwd);
+                await db.collection('users').doc(cred.user.uid).set({
+                    name: email.split('@')[0],
+                    email: email,
+                    role: 'fan',
+                    points: 0,
+                    badges: ['fan'],
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                closeModal();
+            }
+        } catch (err) {
+            showModalMsg(err.message, true);
+        }
+    };
+
+    // Load clips (internal voting)
+    async function loadClips() {
+        clipsContainer.innerHTML = '<div class="clip-card">Loading...</div>';
+        const snapshot = await db.collection('clips').get();
+        if (snapshot.empty) {
+            clipsContainer.innerHTML = '<div class="clip-card">Hakuna clips bado.</div>';
+            return;
+        }
+        let html = '';
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const artist = data.artistName || 'Msanii';
+            const song = data.songTitle || 'Wimbo';
+            const votes = data.totalVotes || 0;
+            const clipId = doc.id;
+            html += `
+                <div class="clip-card">
+                    <div class="clip-artist">🎤 ${artist}</div>
+                    <div class="clip-title">"${song}"</div>
+                    <div class="clip-stats">
+                        <span>❤️ <span id="votes-${clipId}">${votes}</span> kura</span>
+                        <button class="vote-btn" data-id="${clipId}">Piga Kura</button>
+                    </div>
+                </div>
+            `;
+        });
+        clipsContainer.innerHTML = html;
+        document.querySelectorAll('.vote-btn').forEach(btn => {
+            btn.onclick = async () => {
+                const clipId = btn.getAttribute('data-id');
+                await voteForClip(clipId);
+            };
+        });
+    }
+
+    async function voteForClip(clipId) {
+        const user = auth.currentUser;
+        if (!user) return;
+        const userId = user.uid;
+        const voteRef = db.collection('clips').doc(clipId).collection('votes').doc(userId);
+        const existing = await voteRef.get();
+        if (existing.exists) {
+            alert("Umepiga kura tayari kwenye wimbo huu!");
+            return;
+        }
+        await voteRef.set({ votedAt: new Date() });
+        await db.collection('clips').doc(clipId).update({
+            totalVotes: firebase.firestore.FieldValue.increment(1)
+        });
+        const votesSpan = document.getElementById(`votes-${clipId}`);
+        if (votesSpan) votesSpan.innerText = parseInt(votesSpan.innerText) + 1;
+        if (currentUserRole === 'admin') loadAdminStats();
+    }
+
+    async function loadAdminStats() {
+        if (currentUserRole !== 'admin') return;
+        const usersSnap = await db.collection('users').get();
+        totalUsersSpan.innerText = usersSnap.size;
+        const clipsSnap = await db.collection('clips').get();
+        let total = 0;
+        clipsSnap.forEach(doc => total += (doc.data().totalVotes || 0));
+        totalVotesAllSpan.innerText = total;
+    }
+
+    async function pickWinner() {
+        const spotlightRef = db.collection('guestSpotlight').doc('current');
+        const doc = await spotlightRef.get();
+        if (!doc.exists) {
+            winnerResultDiv.innerHTML = '<span class="error">Spotlight haipo</span>';
+            return;
+        }
+        const participants = doc.data().participants || [];
+        if (participants.length === 0) {
+            winnerResultDiv.innerHTML = '<span class="error">Hakuna washiriki</span>';
+            return;
+        }
+        const winnerId = participants[Math.floor(Math.random() * participants.length)];
+        const userDoc = await db.collection('users').doc(winnerId).get();
+        const winnerName = userDoc.exists ? (userDoc.data().name || winnerId) : winnerId;
+        await spotlightRef.update({ winnerId, isDrawn: true, drawDate: new Date() });
+        winnerResultDiv.innerHTML = `<span class="success">🏆 Mshindi: ${winnerName}</span>`;
+    }
+
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            document.querySelector('.navbar').style.display = 'flex';
+            heroSection.style.display = 'none';
+            appSection.style.display = 'block';
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            let name = user.email;
+            let role = 'fan';
+            if (userDoc.exists) {
+                name = userDoc.data().name || user.email;
+                role = userDoc.data().role || 'fan';
+            } else {
+                await db.collection('users').doc(user.uid).set({
+                    name: user.email.split('@')[0],
+                    email: user.email,
+                    role: 'fan',
+                    points: 0,
+                    badges: ['fan'],
+                    createdAt: new Date()
+                });
+            }
+            currentUserRole = role;
+            userNameSpan.innerText = name;
+            if (role === 'admin') {
+                adminDashboard.style.display = 'block';
+                loadAdminStats();
+                pickWinnerBtn.onclick = pickWinner;
+            } else {
+                adminDashboard.style.display = 'none';
+            }
+            loadClips();
+        } else {
+            heroSection.style.display = 'block';
+            appSection.style.display = 'none';
+        }
+    });
+
+    logoutBtnApp.onclick = () => auth.signOut();
+</script>
+</body>
+</html>
